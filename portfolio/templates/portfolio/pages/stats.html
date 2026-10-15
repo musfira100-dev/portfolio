@@ -1,0 +1,36 @@
+{% extends "portfolio/pages/base.html" %}
+{% block heading %}By the <em>numbers</em>{% endblock %}
+{% block css %}
+.st { display: grid; grid-template-columns: repeat(2, 1fr); }
+.st > div { padding: clamp(30px, 5vw, 64px) 0; border-bottom: 1px solid var(--rule); }
+.st > div:nth-child(odd) { padding-right: 40px; border-right: 1px solid var(--rule); }
+.st > div:nth-child(even) { padding-left: clamp(24px, 5vw, 64px); }
+.num { font-family: var(--serif); font-weight: 300; font-size: clamp(3rem, 8vw, 6rem); line-height: .9; letter-spacing: -.03em; }
+.num sup { font-size: .4em; color: var(--accent); vertical-align: top; position: relative; top: .15em; margin-left: 4px; }
+.st .mono { color: var(--muted); display: block; margin-bottom: 14px; }
+.st p { margin-top: 12px; font-family: var(--serif); font-size: 1.1rem; font-style: italic; }
+@media (max-width: 700px) { .st { grid-template-columns: 1fr; } .st > div:nth-child(odd) { border-right: 0; padding-right: 0; } .st > div:nth-child(even) { padding-left: 0; } }
+{% endblock %}
+{% block content %}
+<div class="st">
+{% for label, value, suffix, caption in items %}
+    <div class="rise" style="--d:{{ forloop.counter|add:1 }}">
+        <span class="mono">{{ label }}</span>
+        <div class="num"><span class="count" data-to="{{ value|stringformat:'d' }}">0</span><sup>{{ suffix }}</sup></div>
+        <p>{{ caption }}</p>
+    </div>
+{% endfor %}
+</div>
+{% endblock %}
+{% block js %}
+<script>
+document.querySelectorAll('.count').forEach(el => {
+    const to = +el.dataset.to, t0 = performance.now(), dur = 1600;
+    (function tick(t) {
+        const k = Math.min(1, (t - t0) / dur), e = 1 - Math.pow(1 - k, 4);
+        el.textContent = Math.round(to * e).toLocaleString('en-US');
+        if (k < 1) requestAnimationFrame(tick);
+    })(t0);
+});
+</script>
+{% endblock %}

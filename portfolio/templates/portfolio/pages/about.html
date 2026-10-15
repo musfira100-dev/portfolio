@@ -1,0 +1,20 @@
+{% extends "portfolio/pages/base.html" %}
+{% block heading %}The <em>manifesto</em>{% endblock %}
+{% block css %}
+.statement { font-family: var(--serif); font-weight: 300; font-size: clamp(1.3rem, 2.9vw, 2.2rem); line-height: 1.15; letter-spacing: -.01em; text-transform: uppercase; max-width: 1000px; }
+.cols { display: grid; grid-template-columns: 1fr 1fr; gap: clamp(28px, 6vw, 90px); }
+.quote { font-family: var(--serif); font-style: italic; font-size: clamp(1.1rem, 1.9vw, 1.5rem); line-height: 1.35; border-left: 2px solid var(--accent); padding-left: 24px; }
+@media (max-width: 760px) { .cols { grid-template-columns: 1fr; } }
+{% endblock %}
+{% block content %}
+<section class="block rise" style="--d:2"><p class="statement">{{ profile.bio }}</p></section>
+<section class="block rise" style="--d:3">
+    <div class="cols">
+        <p class="quote">“{{ profile.manifesto_quote }}”</p>
+        <div>
+            <p style="font-size:14.5px;margin-bottom:22px">{{ profile.manifesto_text }}</p>
+            <div>{% for t in tags %}<span class="tag mono">{{ t }}</span>{% endfor %}</div>
+        </div>
+    </div>
+</section>
+{% endblock %}

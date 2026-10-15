@@ -1,0 +1,642 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="csrf-token" content="{{ csrf_token }}">
+
+    <title>{% block fulltitle %}{% block title %}{{ page_label }}{% endblock %} — {{ profile.name }}{% endblock %}</title>
+
+    {% block head %}{% endblock %}
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400;1,500&family=IBM+Plex+Mono:wght@400;500&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+
+    <style>
+        /* ===== INNER PAGES ===== */
+        :root {
+            --paper: #F5F7FF;
+            --paper-2: #FFFFFF;
+            --ink: #0E1130;
+            --muted: #5C6285;
+            --rule: rgba(14, 17, 48, 0.14);
+            --accent: #6C4CF1;
+            --blue: #3B5BFF;
+            --violet: #8A5CFF;
+            --pink: #FF5C8A;
+            --lemon: #FFD84D;
+            --grad: linear-gradient(120deg, #3B5BFF, #8A5CFF 55%, #FF5C8A);
+            --serif: 'Cormorant Garamond', Georgia, serif;
+            --sans: 'Inter', system-ui, sans-serif;
+            --mono: 'IBM Plex Mono', ui-monospace, monospace;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            background: var(--paper);
+            color: var(--ink);
+            font-family: var(--sans);
+            font-weight: 300;
+            font-size: 14px;
+            line-height: 1.7;
+            -webkit-font-smoothing: antialiased;
+            overflow-x: hidden;
+        }
+
+        body::before {
+            content: "";
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            z-index: 0;
+            opacity: .5;
+            background-image: radial-gradient(rgba(59,91,255,.10) 1px, transparent 1px);
+            background-size: 3px 3px;
+        }
+
+        a {
+            color: inherit;
+            text-decoration: none;
+        }
+
+        ::selection {
+            background: var(--accent);
+            color: var(--paper);
+        }
+
+        .wrap {
+            position: relative;
+            z-index: 1;
+            max-width: 1240px;
+            margin: 0 auto;
+            padding: 0 clamp(20px, 4vw, 56px);
+        }
+
+        .mono {
+            font-family: var(--mono);
+            font-size: 10.5px;
+            letter-spacing: .14em;
+            text-transform: uppercase;
+        }
+
+        /* Navbar */
+        .bar {
+            position: sticky;
+            top: 0;
+            z-index: 20;
+            background: rgba(245, 247, 255, .9);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid var(--rule);
+        }
+
+        .bar .wrap {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 24px;
+            height: 64px;
+        }
+
+        .bar::after {
+            content: "";
+            position: absolute;
+            left: 0;
+            right: 0;
+            bottom: -1px;
+            height: 2px;
+            background: var(--grad);
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            white-space: nowrap;
+        }
+
+        .brand .back {
+            border: 1px solid var(--ink);
+            border-radius: 99px;
+            padding: 6px 14px;
+            transition: .25s;
+        }
+
+        .brand .back:hover {
+            background: var(--ink);
+            color: var(--paper);
+        }
+
+        .brand .nm {
+            font-family: var(--serif);
+            font-size: 19px;
+            font-weight: 500;
+            letter-spacing: .01em;
+        }
+
+        .nav {
+            display: flex;
+            gap: 22px;
+            overflow-x: auto;
+            scrollbar-width: none;
+        }
+
+        .nav::-webkit-scrollbar {
+            display: none;
+        }
+
+        .nav a {
+            color: var(--muted);
+            padding: 4px 0;
+            border-bottom: 1px solid transparent;
+            white-space: nowrap;
+            transition: .25s;
+        }
+
+        .nav a:hover,
+        .nav a.on {
+            color: var(--ink);
+            border-color: var(--accent);
+        }
+
+        .nav a.rs {
+            background: var(--grad);
+            color: #fff;
+            border: 0;
+            border-radius: 99px;
+            padding: 5px 16px;
+        }
+
+        .nav a.rs:hover {
+            color: #fff;
+            transform: translateY(-2px);
+        }
+
+        @media (max-width: 860px) {
+            .brand .nm {
+                display: none;
+            }
+        }
+
+        /* Page heading */
+        .head {
+            padding: clamp(40px, 7vw, 92px) 0 clamp(24px, 3vw, 40px);
+            border-bottom: 1px solid var(--ink);
+        }
+
+        .kicker {
+            display: flex;
+            gap: 14px;
+            align-items: center;
+            color: var(--accent);
+            margin-bottom: 18px;
+        }
+
+        .kicker::before {
+            content: "";
+            width: 38px;
+            height: 2px;
+            background: var(--grad);
+        }
+
+        .title {
+            font-family: var(--serif);
+            font-weight: 300;
+            line-height: .9;
+            letter-spacing: -.02em;
+            font-size: clamp(2.3rem, 7.2vw, 5.6rem);
+        }
+
+        .title em {
+            font-style: italic;
+            font-weight: 400;
+            background: var(--grad);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            -webkit-text-fill-color: transparent;
+            padding-right: .06em;
+        }
+
+        .lede {
+            max-width: 520px;
+            margin-top: 20px;
+            color: var(--muted);
+            font-size: 13.5px;
+        }
+
+        /* Generic elements */
+        section.block {
+            padding: clamp(40px, 6vw, 84px) 0;
+            border-bottom: 1px solid var(--rule);
+        }
+
+        h2.serif,
+        .serif {
+            font-family: var(--serif);
+            font-weight: 400;
+        }
+
+        .tag {
+            display: inline-block;
+            border: 1px solid var(--ink);
+            border-radius: 99px;
+            padding: 4px 14px;
+            margin: 0 8px 8px 0;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            background: var(--ink);
+            color: var(--paper);
+            padding: 14px 26px;
+            border-radius: 99px;
+            border: 0;
+            cursor: pointer;
+            transition: .3s;
+            font-family: var(--mono);
+            font-size: 11px;
+            letter-spacing: .14em;
+            text-transform: uppercase;
+        }
+
+        .btn:hover {
+            background: var(--grad);
+            transform: translateY(-2px);
+        }
+
+        .btn.ghost {
+            background: transparent;
+            color: var(--ink);
+            border: 1px solid var(--ink);
+        }
+
+        .btn.ghost:hover {
+            background: var(--ink);
+            color: var(--paper);
+        }
+
+        /* Entrance animation */
+        .rise {
+            opacity: 0;
+            transform: translateY(26px);
+            animation: rise .9s cubic-bezier(.16, 1, .3, 1) forwards;
+            animation-delay: calc(var(--d, 0) * 90ms);
+        }
+
+        @keyframes rise {
+            to {
+                opacity: 1;
+                transform: none;
+            }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            .rise {
+                animation: none;
+                opacity: 1;
+                transform: none;
+            }
+        }
+
+        /* Footer */
+        .foot {
+            position: relative;
+            z-index: 1;
+            background: var(--ink);
+            color: var(--paper);
+            margin-top: 0;
+        }
+
+        .foot .next {
+            display: block;
+            padding: clamp(36px, 5vw, 70px) 0;
+            border-bottom: 1px solid rgba(236, 231, 220, .2);
+        }
+
+        .foot .next .mono {
+            color: rgba(236, 231, 220, .55);
+        }
+
+        .foot .next .big {
+            font-family: var(--serif);
+            font-weight: 300;
+            font-size: clamp(2rem, 6.5vw, 4.6rem);
+            line-height: 1;
+            letter-spacing: -.02em;
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            gap: 20px;
+            transition: .4s;
+        }
+
+        .foot .next:hover .big {
+            color: #B9A8FF;
+            padding-left: 18px;
+        }
+
+        .foot .row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 18px 36px;
+            justify-content: space-between;
+            padding: 28px 0 40px;
+            color: rgba(236, 231, 220, .6);
+        }
+
+        .foot a:hover {
+            color: #B9A8FF;
+        }
+
+        /* Footer social icons */
+        .foot .fs {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .foot .fs a {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 7px 15px 7px 12px;
+            border-radius: 99px;
+            border: 1px solid rgba(245, 247, 255, .25);
+            color: #F5F7FF;
+            transition: .3s;
+        }
+
+        .foot .fs .ic {
+            width: 15px;
+            height: 15px;
+            fill: currentColor;
+            transition: transform .3s;
+        }
+
+        .foot .fs a:hover {
+            color: #fff;
+            border-color: transparent;
+            transform: translateY(-3px);
+        }
+
+        .foot .fs a:hover .ic {
+            transform: scale(1.2) rotate(-6deg);
+        }
+
+        .s-gh:hover { background: #24292f; }
+        .s-li:hover { background: #0A66C2; }
+        .s-fb:hover { background: #1877F2; }
+
+        .s-ig:hover {
+            background: linear-gradient(45deg, #F9A03F, #E1306C 55%, #833AB4);
+        }
+
+        .s-x:hover {
+            background: #000;
+        }
+
+        /* Custom cursor */
+        #cur,
+        #cur-ring {
+            position: fixed;
+            top: 0;
+            left: 0;
+            pointer-events: none;
+            z-index: 999;
+            border-radius: 50%;
+            opacity: 0;
+            transition: opacity .3s, width .3s, height .3s, background .3s, border-color .3s;
+        }
+
+        #cur {
+            width: 8px;
+            height: 8px;
+            background: var(--ink);
+            margin: -4px 0 0 -4px;
+        }
+
+        #cur-ring {
+            width: 36px;
+            height: 36px;
+            border: 1px solid var(--ink);
+            margin: -18px 0 0 -18px;
+        }
+
+        html.has-cursor.moved #cur,
+        html.has-cursor.moved #cur-ring {
+            opacity: 1;
+        }
+
+        html.has-cursor.hov #cur-ring {
+            width: 68px;
+            height: 68px;
+            margin: -34px 0 0 -34px;
+            background: rgba(217, 56, 30, .12);
+            border-color: var(--accent);
+        }
+
+        html.has-cursor.hov #cur {
+            background: var(--accent);
+        }
+
+        @media (hover: hover) and (pointer: fine) {
+            html.has-cursor,
+            html.has-cursor * {
+                cursor: none !important;
+            }
+        }
+
+        @media (hover: none), (pointer: coarse) {
+            #cur,
+            #cur-ring {
+                display: none;
+            }
+        }
+
+        {% block css %}{% endblock %}
+    </style>
+</head>
+
+<body>
+    <svg width="0" height="0" style="position:absolute" aria-hidden="true">
+        <symbol id="i-gh" viewBox="0 0 24 24">
+            <path d="M12 .5C5.65.5.5 5.65.5 12c0 5.08 3.29 9.39 7.86 10.91.58.1.79-.25.79-.56v-2c-3.2.7-3.87-1.36-3.87-1.36-.52-1.33-1.28-1.69-1.28-1.69-1.05-.72.08-.7.08-.7 1.15.08 1.76 1.19 1.76 1.19 1.03 1.76 2.7 1.25 3.36.96.1-.75.4-1.25.73-1.54-2.55-.29-5.24-1.28-5.24-5.69 0-1.26.45-2.28 1.19-3.09-.12-.29-.52-1.46.11-3.05 0 0 .97-.31 3.17 1.18a11 11 0 0 1 5.78 0c2.2-1.49 3.17-1.18 3.17-1.18.63 1.59.23 2.76.11 3.05.74.81 1.19 1.83 1.19 3.09 0 4.42-2.69 5.39-5.25 5.68.41.36.78 1.06.78 2.14v3.17c0 .31.21.67.8.56A11.51 11.51 0 0 0 23.5 12C23.5 5.65 18.35.5 12 .5Z"/>
+        </symbol>
+
+        <symbol id="i-in" viewBox="0 0 24 24">
+            <path d="M20.45 20.45h-3.56v-5.57c0-1.33-.03-3.04-1.85-3.04-1.86 0-2.14 1.45-2.14 2.94v5.67H9.35V9h3.41v1.56h.05c.48-.9 1.64-1.85 3.37-1.85 3.6 0 4.27 2.37 4.27 5.46v6.28ZM5.34 7.43a2.06 2.06 0 1 1 0-4.12 2.06 2.06 0 0 1 0 4.12ZM7.12 20.45H3.56V9h3.56v11.45ZM22.22 0H1.77C.79 0 0 .77 0 1.73v20.54C0 23.23.79 24 1.77 24h20.45c.98 0 1.78-.77 1.78-1.73V1.73C24 .77 23.2 0 22.22 0Z"/>
+        </symbol>
+
+        <symbol id="i-fb" viewBox="0 0 24 24">
+            <path d="M24 12.07C24 5.4 18.63 0 12 0S0 5.4 0 12.07C0 18.1 4.39 23.1 10.13 24v-8.44H7.08v-3.49h3.05V9.41c0-3.02 1.79-4.7 4.53-4.7 1.31 0 2.69.24 2.69.24v2.97h-1.52c-1.49 0-1.96.93-1.96 1.89v2.26h3.33l-.53 3.49h-2.8V24C19.61 23.1 24 18.1 24 12.07Z"/>
+        </symbol>
+
+        <symbol id="i-ig" viewBox="0 0 24 24">
+            <path d="M12 2.16c3.2 0 3.58.01 4.85.07 3.25.15 4.77 1.69 4.92 4.92.06 1.27.07 1.65.07 4.85s-.01 3.58-.07 4.85c-.15 3.23-1.66 4.77-4.92 4.92-1.27.06-1.64.07-4.85.07s-3.58-.01-4.85-.07c-3.26-.06-4.77-1.7-4.92-4.92-.06-1.27-.07-1.64-.07-4.85s.01-3.58.07-4.85C2.38 3.92 3.9 2.38 7.15 2.23 8.42 2.17 8.8 2.16 12 2.16ZM12 0C8.74 0 8.33.01 7.05.07 2.7.27.27 2.69.07 7.05.01 8.33 0 8.74 0 12s.01 3.67.07 4.95c.2 4.36 2.62 6.78 6.98 6.98C8.33 23.99 8.74 24 12 24s3.67-.01 4.95-.07c4.35-.2 6.78-2.62 6.98-6.98.06-1.28.07-1.69.07-4.95s-.01-3.67-.07-4.95c-.2-4.35-2.62-6.78-6.98-6.98C15.67.01 15.26 0 12 0Zm0 5.84a6.16 6.16 0 1 0 0 12.32 6.16 6.16 0 0 0 0-12.32ZM12 16a4 4 0 1 1 0-8 4 4 0 0 1 0 8Zm6.4-11.85a1.44 1.44 0 1 0 0 2.88 1.44 1.44 0 0 0 0-2.88Z"/>
+        </symbol>
+
+        <symbol id="i-x" viewBox="0 0 24 24">
+            <path d="M18.9 1.15h3.68l-8.04 9.19L24 22.85h-7.4l-5.8-7.58-6.63 7.58H.49l8.6-9.83L0 1.15h7.59l5.24 6.93 6.07-6.93Zm-1.29 19.5h2.04L6.48 3.24H4.3l13.31 17.41Z"/>
+        </symbol>
+    </svg>
+
+    <div id="cur"></div>
+    <div id="cur-ring"></div>
+
+    {% block navbar %}
+    <header class="bar">
+        <div class="wrap">
+            <div class="brand">
+                {% block brandback %}
+                <a href="{% url 'portfolio:index' %}" class="back mono">← Home</a>
+                {% endblock %}
+                <span class="nm">{{ profile.name }}</span>
+            </div>
+
+            <nav class="nav mono">
+                {% block navlinks %}
+                    {% for n in nav %}
+                        <a href="{{ n.url }}" class="{% if n.active %}on{% endif %}">{{ n.label }}</a>
+                    {% endfor %}
+                {% endblock %}
+
+                {% if profile.resume %}
+                    <a href="{{ profile.resume.url }}" target="_blank" rel="noopener" class="rs">Resume ↓</a>
+                {% endif %}
+            </nav>
+        </div>
+    </header>
+    {% endblock navbar %}
+
+    {% block main %}
+    <main>
+        <div class="wrap">
+            <div class="head">
+                <div class="kicker mono rise">{{ page_num }} — {{ page_label }}</div>
+
+                <h1 class="title rise" style="--d:1">
+                    {% block heading %}{{ page_label }}{% endblock %}
+                </h1>
+
+                {% block lede %}{% endblock %}
+            </div>
+
+            {% block content %}{% endblock %}
+        </div>
+    </main>
+    {% endblock main %}
+
+    {% block footer %}
+    <footer class="foot">
+        <div class="wrap">
+            {% block foot_next %}
+            <a href="{{ next_page.url }}" class="next">
+                <span class="mono">Next page · {{ next_page.num }}</span>
+                <span class="big">
+                    <span>{{ next_page.label }}</span>
+                    <span>→</span>
+                </span>
+            </a>
+            {% endblock %}
+
+            <div class="row mono">
+                <span>© 2026 {{ profile.name }}</span>
+                <a href="mailto:{{ profile.email }}">{{ profile.email }}</a>
+
+                <span class="fs">
+                    {% if profile.github_url %}
+                    <a href="{{ profile.github_url }}" target="_blank" rel="noopener" class="s-gh">
+                        <svg class="ic"><use href="#i-gh"/></svg>GitHub
+                    </a>
+                    {% endif %}
+
+                    {% if profile.linkedin_url %}
+                    <a href="{{ profile.linkedin_url }}" target="_blank" rel="noopener" class="s-li">
+                        <svg class="ic"><use href="#i-in"/></svg>LinkedIn
+                    </a>
+                    {% endif %}
+
+                    {% if profile.facebook_url %}
+                    <a href="{{ profile.facebook_url }}" target="_blank" rel="noopener" class="s-fb">
+                        <svg class="ic"><use href="#i-fb"/></svg>Facebook
+                    </a>
+                    {% endif %}
+
+                    {% if profile.instagram_url %}
+                    <a href="{{ profile.instagram_url }}" target="_blank" rel="noopener" class="s-ig">
+                        <svg class="ic"><use href="#i-ig"/></svg>Instagram
+                    </a>
+                    {% endif %}
+
+                    {% if profile.twitter_url %}
+                    <a href="{{ profile.twitter_url }}" target="_blank" rel="noopener" class="s-x">
+                        <svg class="ic"><use href="#i-x"/></svg>X
+                    </a>
+                    {% endif %}
+                </span>
+
+                {% block backlink %}
+                <a href="{% url 'portfolio:index' %}">Back to landing ↑</a>
+                {% endblock %}
+            </div>
+        </div>
+    </footer>
+    {% endblock footer %}
+
+    <script>
+    (function () {
+        const root = document.documentElement;
+
+        if (!window.matchMedia('(hover: hover) and (pointer: fine)').matches) return;
+
+        root.classList.add('has-cursor');
+
+        const dot = document.getElementById('cur');
+        const ring = document.getElementById('cur-ring');
+
+        let mx = innerWidth / 2;
+        let my = innerHeight / 2;
+        let rx = mx;
+        let ry = my;
+
+        addEventListener('mousemove', e => {
+            root.classList.add('moved');
+            mx = e.clientX;
+            my = e.clientY;
+        });
+
+        document.addEventListener('mouseover', e => {
+            root.classList.toggle(
+                'hov',
+                !!e.target.closest('a, button, input, textarea, label')
+            );
+        });
+
+        (function loop() {
+            rx += (mx - rx) * .18;
+            ry += (my - ry) * .18;
+
+            dot.style.transform = `translate3d(${mx}px, ${my}px, 0)`;
+            ring.style.transform = `translate3d(${rx}px, ${ry}px, 0)`;
+
+            requestAnimationFrame(loop);
+        })();
+    })();
+    </script>
+
+    {% block js %}{% endblock %}
+</body>
+</html>

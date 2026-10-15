@@ -1,0 +1,21 @@
+{% extends "portfolio/pages/base.html" %}
+{% block heading %}What I <em>do</em>{% endblock %}
+{% block css %}
+.svc { display: grid; grid-template-columns: 56px 1fr 240px; gap: 16px 32px; align-items: center; padding: 28px 0; border-bottom: 1px solid var(--rule); }
+.svc .n { color: var(--accent); }
+.svc h3 { font-family: var(--serif); font-weight: 400; font-size: clamp(1.25rem, 2.3vw, 1.9rem); line-height: 1.08; margin-bottom: 10px; text-transform: uppercase; }
+.svc p { color: var(--muted); max-width: 560px; }
+.svc .im { aspect-ratio: 4 / 3; overflow: hidden; border-radius: 4px; background: linear-gradient(135deg, #C9D3FF, #FFC9DA); }
+.svc .im img { width: 100%; height: 100%; object-fit: cover; transition: transform .8s cubic-bezier(.16, 1, .3, 1); }
+.svc:hover .im img { transform: scale(1.08); }
+@media (max-width: 800px) { .svc { grid-template-columns: 1fr; } .svc .im { max-width: 420px; } }
+{% endblock %}
+{% block content %}
+{% for n, s in items %}
+<article class="svc rise" style="--d:{{ n|add:1 }}">
+    <span class="n mono">{{ n|stringformat:"02d" }}</span>
+    <div><h3>{{ s.title }}</h3><p>{{ s.description }}</p></div>
+    <div class="im">{% if s.image_src %}<img src="{{ s.image_src }}" alt="{{ s.title }}" loading="lazy">{% endif %}</div>
+</article>
+{% empty %}<p style="padding:60px 0;color:var(--muted)">Abhi koi service nahi — admin se add karein.</p>{% endfor %}
+{% endblock %}

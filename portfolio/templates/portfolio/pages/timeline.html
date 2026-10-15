@@ -1,0 +1,20 @@
+{% extends "portfolio/pages/base.html" %}
+{% block heading %}The <em>journey</em>{% endblock %}
+{% block lede %}<p class="lede rise" style="--d:2"></p>{% endblock %}
+{% block css %}
+.tl { display: grid; grid-template-columns: 170px 1fr; gap: 10px 40px; padding: 30px 0; border-bottom: 1px solid var(--rule); transition: .35s; }
+.tl:hover { padding-left: 14px; }
+.tl:hover .yr { color: var(--accent); }
+.yr { font-family: var(--serif); font-weight: 300; font-size: clamp(2.1rem, 4.4vw, 3.3rem); line-height: .9; transition: .35s; }
+.tl h3 { font-family: var(--serif); font-weight: 500; font-size: clamp(1.15rem, 1.8vw, 1.5rem); line-height: 1.2; margin-bottom: 8px; }
+.tl p { color: var(--muted); max-width: 640px; }
+@media (max-width: 700px) { .tl { grid-template-columns: 1fr; } }
+{% endblock %}
+{% block content %}
+{% for e in entries %}
+<article class="tl rise" style="--d:{{ forloop.counter|add:1 }}">
+    <div class="yr">{{ e.year }}</div>
+    <div><h3>{{ e.title }}</h3><p>{{ e.text }}</p></div>
+</article>
+{% empty %}<p style="padding:60px 0;color:var(--muted)"></p>{% endfor %}
+{% endblock %}

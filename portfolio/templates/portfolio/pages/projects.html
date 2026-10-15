@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ project.title }} — {{ profile.name }}</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #F5F7FF; --ink: #0E1130; --muted: #5C6285; --card: #FFFFFF; --line: rgba(14, 17, 48, .09);
+            --blue: #3B5BFF; --violet: #8A5CFF; --pink: #FF5C8A; --lemon: #FFD84D;
+            --grad: linear-gradient(120deg, var(--blue), var(--violet) 55%, var(--pink));
+            --head: 'Sora', system-ui, sans-serif; --body: 'Plus Jakarta Sans', system-ui, sans-serif;
+            --shadow: 0 24px 60px -28px rgba(40, 50, 140, .35);
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        html { scroll-behavior: smooth; scroll-padding-top: 90px; }
+        body { background: var(--bg); color: var(--ink); font-family: var(--body); font-size: 15px; line-height: 1.7; -webkit-font-smoothing: antialiased; overflow-x: hidden; }
+        a { color: inherit; text-decoration: none; }
+        img { max-width: 100%; display: block; }
+        ::selection { background: var(--violet); color: #fff; }
+        .c { width: min(1180px, calc(100% - 40px)); margin: 0 auto; }
+        .g { background: var(--grad); -webkit-background-clip: text; background-clip: text; color: transparent; -webkit-text-fill-color: transparent; }
+
+        /* buttons */
+        .btn { display: inline-flex; align-items: center; gap: 10px; border: 0; cursor: pointer; font: 600 14px var(--body); padding: 14px 26px; border-radius: 99px; transition: transform .25s, box-shadow .25s, background .25s; will-change: transform; }
+        .btn-p { background: var(--grad); color: #fff; box-shadow: 0 16px 34px -12px rgba(110, 80, 255, .7); }
+        .btn-p:hover { box-shadow: 0 22px 44px -12px rgba(110, 80, 255, .85); }
+        .btn-o { background: #fff; color: var(--ink); border: 1px solid var(--line); }
+        .btn-o:hover { border-color: var(--violet); color: var(--violet); }
+        .btn span { display: inline-block; transition: transform .3s; }
+        .btn:hover span { transform: translate(3px, -3px); }
+
+        /* navbar (floating pill) */
+        .nav { position: fixed; top: 14px; left: 50%; transform: translateX(-50%); z-index: 50; width: min(1120px, calc(100% - 28px));
+               display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 8px 10px 8px 14px; border-radius: 99px;
+               background: rgba(255, 255, 255, .7); backdrop-filter: blur(16px); border: 1px solid rgba(255, 255, 255, .8); transition: box-shadow .3s, background .3s; }
+        .nav.sc { background: rgba(255, 255, 255, .92); box-shadow: 0 14px 40px -18px rgba(40, 50, 140, .4); }
+        .logo { display: flex; align-items: center; gap: 10px; font: 700 15px var(--head); white-space: nowrap; }
+        .logo i { width: 34px; height: 34px; border-radius: 50%; background: var(--grad); color: #fff; display: grid; place-items: center; font: 700 13px var(--head); font-style: normal; }
+        .links { display: flex; gap: 2px; }
+        .links a { padding: 8px 13px; border-radius: 99px; font-size: 13px; font-weight: 500; color: var(--muted); transition: .25s; }
+        .links a:hover, .links a.on { color: var(--violet); background: rgba(138, 92, 255, .1); }
+        .burger { display: none; width: 40px; height: 40px; border-radius: 50%; border: 0; background: var(--grad); cursor: pointer; position: relative; }
+        .burger i { position: absolute; left: 11px; right: 11px; height: 2px; background: #fff; border-radius: 2px; transition: .3s; }
+        .burger i:nth-child(1) { top: 14px; } .burger i:nth-child(2) { top: 19px; } .burger i:nth-child(3) { top: 24px; }
+        .burger.open i:nth-child(1) { top: 19px; transform: rotate(45deg); } .burger.open i:nth-child(2) { opacity: 0; } .burger.open i:nth-child(3) { top: 19px; transform: rotate(-45deg); }
+        .menu { position: fixed; top: 74px; left: 14px; right: 14px; z-index: 49; background: #fff; border-radius: 26px; padding: 14px; box-shadow: 0 30px 60px -20px rgba(40, 50, 140, .5);
+                opacity: 0; transform: translateY(-12px); pointer-events: none; transition: .3s; max-height: calc(100vh - 100px); overflow: auto; }
+        .menu.open { opacity: 1; transform: none; pointer-events: auto; }
+        .menu a { display: block; padding: 12px 16px; border-radius: 14px; font-weight: 500; }
+        .menu a:hover { background: rgba(138, 92, 255, .1); }
+        .menu h6 { font: 600 11px var(--body); letter-spacing: .14em; text-transform: uppercase; color: var(--muted); padding: 10px 16px 4px; }
+        @media (max-width: 1040px) { .links { display: none; } .burger { display: block; } }
+        @media (max-width: 600px) { .nav-r .rs { display: none; } }
+
+        /* marquee */
+        .mq { position: relative; z-index: 2; margin: 0 -4vw; padding: 18px 0; background: var(--grad); color: #fff; transform: rotate(-1.6deg); overflow: hidden; box-shadow: 0 20px 50px -24px rgba(110, 80, 255, .7); }
+        .mq-t { display: flex; width: max-content; gap: 34px; animation: marq 28s linear infinite; }
+        .mq:hover .mq-t { animation-play-state: paused; }
+        .mq span { font: 700 clamp(1rem, 2vw, 1.4rem) var(--head); text-transform: uppercase; letter-spacing: .04em; white-space: nowrap; }
+        .mq i { font-style: normal; opacity: .75; }
+        @keyframes marq { to { transform: translateX(-50%); } }
+
+        /* social buttons */
+        .soc, .fsoc { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 22px; }
+        .soc a, .fsoc a { display: inline-flex; align-items: center; gap: 9px; padding: 9px 18px 9px 14px; border-radius: 99px; border: 1px solid var(--line); background: #fff; font-weight: 600; font-size: 13px; transition: .3s; }
+        .fsoc a { background: var(--bg); }
+        .soc .ic, .fsoc .ic { width: 17px; height: 17px; fill: currentColor; flex: none; transition: transform .3s; }
+        .soc a:hover, .fsoc a:hover { color: #fff; border-color: transparent; transform: translateY(-3px); box-shadow: 0 14px 26px -12px rgba(0, 0, 0, .4); }
+        .soc a:hover .ic, .fsoc a:hover .ic { transform: scale(1.18) rotate(-6deg); }
+        .s-gh:hover { background: #24292f; } .s-li:hover { background: #0A66C2; } .s-fb:hover { background: #1877F2; }
+        .s-ig:hover { background: linear-gradient(45deg, #F9A03F, #E1306C 55%, #833AB4); } .s-x:hover { background: #000; }
+
+        /* footer */
+        footer { padding: 60px 0 36px; border-top: 1px solid var(--line); background: #fff; }
+        .fg2 { display: grid; grid-template-columns: 1.4fr 1fr 1fr; gap: 30px; }
+        .fbig { font: 800 clamp(1.8rem, 4vw, 3rem)/1 var(--head); letter-spacing: -.03em; }
+        footer h6 { font: 700 12px var(--body); text-transform: uppercase; letter-spacing: .12em; color: var(--muted); margin-bottom: 12px; }
+        footer li { list-style: none; margin-bottom: 8px; } footer li a { color: var(--ink); font-weight: 500; transition: .25s; } footer li a:hover { color: var(--violet); padding-left: 4px; }
+        .fb { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 12px; margin-top: 40px; padding-top: 22px; border-top: 1px solid var(--line); color: var(--muted); font-size: 13px; }
+        .top { width: 44px; height: 44px; border-radius: 50%; background: var(--grad); color: #fff; display: grid; place-items: center; font-weight: 700; transition: transform .3s; }
+        .top:hover { transform: translateY(-5px); }
+        @media (max-width: 760px) { .fg2 { grid-template-columns: 1fr 1fr; } .fg2 > div:first-child { grid-column: span 2; } }
+
+        /* footer links: 2-2 ki row mein */
+        footer ul { display: grid; grid-template-columns: repeat(2, minmax(0, max-content)); gap: 8px 28px; }
+        footer li { margin-bottom: 0; }
+        .fg2 { grid-template-columns: 1.3fr 1fr 1fr; }
+
+        /* project page */
+        .pg { position: relative; padding: 118px 0 clamp(50px, 7vw, 90px); overflow: hidden; }
+        .pg::before { content: ""; position: absolute; inset: 0; background-image: radial-gradient(rgba(59, 91, 255, .14) 1.2px, transparent 1.2px); background-size: 26px 26px;
+                      -webkit-mask-image: radial-gradient(ellipse at 70% 10%, #000 0%, transparent 65%); mask-image: radial-gradient(ellipse at 70% 10%, #000 0%, transparent 65%); pointer-events: none; }
+        .blob { position: absolute; border-radius: 50%; filter: blur(70px); opacity: .5; animation: float 16s ease-in-out infinite; pointer-events: none; }
+        .b1 { width: 380px; height: 380px; background: #AEBBFF; right: -90px; top: 80px; }
+        .b2 { width: 300px; height: 300px; background: #FFB3CB; left: -90px; top: 55%; animation-delay: -6s; }
+        @keyframes float { 50% { transform: translate(34px, -28px) scale(1.1); } }
+        .pg .c { position: relative; z-index: 1; }
+        .fade { opacity: 0; transform: translateY(22px); animation: fadeUp .9s cubic-bezier(.16, 1, .3, 1) forwards; animation-delay: calc(.1s + var(--d, 0) * .1s); }
+        @keyframes fadeUp { to { opacity: 1; transform: none; } }
+
+        .back { display: inline-flex; align-items: center; gap: 8px; font: 600 13px var(--body); color: var(--muted); padding: 8px 18px; border-radius: 99px; background: #fff; border: 1px solid var(--line); transition: .25s; }
+        .back:hover { color: var(--violet); border-color: var(--violet); transform: translateX(-3px); }
+        .eyebrow { display: inline-block; background: rgba(138, 92, 255, .12); color: var(--violet); font: 700 12px var(--body); letter-spacing: .12em; text-transform: uppercase; padding: 6px 14px; border-radius: 99px; margin: 26px 0 14px; }
+        .ptitle { font: 800 clamp(2rem, 5.6vw, 4.2rem)/1.04 var(--head); letter-spacing: -.035em; max-width: 960px; }
+
+        /* bari image (poori dikhti hai + peeche usi ka blur) */
+        .hero-im { position: relative; margin: clamp(28px, 4vw, 48px) 0; aspect-ratio: 16 / 8; overflow: hidden; border-radius: 28px; background: linear-gradient(135deg, #AEBBFF, #FFB3CB); box-shadow: var(--shadow); }
+        .hero-im .bgimg { position: absolute; inset: -30px; width: calc(100% + 60px); height: calc(100% + 60px); max-width: none; object-fit: cover; filter: blur(34px) saturate(1.25); opacity: .8; }
+        .hero-im .main { position: relative; z-index: 1; width: 100%; height: 100%; object-fit: contain; padding: 18px; }
+        .num-chip { position: absolute; left: 20px; top: 18px; z-index: 2; background: rgba(255, 255, 255, .92); border-radius: 99px; padding: 8px 18px; font: 600 12px var(--body); letter-spacing: .06em; text-transform: uppercase; backdrop-filter: blur(6px); }
+        .num-chip b { color: var(--violet); }
+        .spin-badge { position: absolute; right: 22px; bottom: 20px; z-index: 2; width: 104px; height: 104px; border-radius: 50%; background: var(--lemon); color: var(--ink); display: grid; place-items: center; font-size: 24px; font-weight: 700; box-shadow: 0 14px 30px rgba(0, 0, 0, .3); transition: transform .35s; }
+        .spin-badge:hover { transform: scale(1.1); }
+        .spin-badge svg { position: absolute; inset: 0; width: 100%; height: 100%; animation: spin 16s linear infinite; }
+        .spin-badge text { font: 600 7.2px var(--body); fill: var(--ink); letter-spacing: 1px; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        /* stack ki patti */
+        .mq.flat { transform: none; margin: 0 0 clamp(30px, 4vw, 54px); border-radius: 18px; padding: 14px 0; }
+
+        /* details */
+        .det { display: grid; grid-template-columns: 320px 1fr; gap: 30px clamp(30px, 5vw, 60px); align-items: start; padding-bottom: clamp(40px, 6vw, 80px); }
+        .det dl { display: grid; gap: 20px; background: #fff; border: 1px solid var(--line); border-radius: 26px; padding: 28px; box-shadow: var(--shadow); position: relative; overflow: hidden; }
+        .det dl::before { content: ""; position: absolute; left: 0; right: 0; top: 0; height: 4px; background: linear-gradient(90deg, var(--blue), var(--violet), var(--pink), var(--blue)); background-size: 200% 100%; animation: flow 4s linear infinite; }
+        @keyframes flow { to { background-position: -200% 0; } }
+        .det dt { font: 700 11px var(--body); letter-spacing: .12em; text-transform: uppercase; color: var(--muted); margin-bottom: 4px; }
+        .det dd { font: 700 1.05rem/1.3 var(--head); }
+        .det .tag { display: inline-block; padding: 6px 14px; margin: 0 6px 6px 0; border-radius: 99px; font: 600 12px var(--body); background: rgba(59, 91, 255, .08); color: var(--blue); transition: .25s; }
+        .det .tag:nth-child(3n+2) { background: rgba(255, 92, 138, .1); color: var(--pink); }
+        .det .tag:nth-child(3n) { background: rgba(138, 92, 255, .1); color: var(--violet); }
+        .desc { color: var(--muted); font-size: 15.5px; max-width: 680px; margin-bottom: 28px; }
+        .acts { display: flex; flex-wrap: wrap; gap: 12px; }
+
+        /* previous / next */
+        .pn { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+        .pn a { position: relative; display: flex; align-items: flex-end; min-height: 200px; border-radius: 26px; overflow: hidden; color: #fff; padding: 24px; background: linear-gradient(135deg, #3B5BFF, #FF5C8A); box-shadow: var(--shadow); }
+        .pn a .bgimg { position: absolute; inset: -24px; width: calc(100% + 48px); height: calc(100% + 48px); max-width: none; object-fit: cover; filter: blur(26px) saturate(1.2); opacity: .85; }
+        .pn a .main { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; padding: 12px 12px 70px; transition: transform .9s cubic-bezier(.16, 1, .3, 1); }
+        .pn a::after { content: ""; position: absolute; inset: 0; background: linear-gradient(to top, rgba(14, 17, 48, .85), rgba(14, 17, 48, .05) 70%); }
+        .pn a:hover .main { transform: scale(1.06); }
+        .pn a > div { position: relative; z-index: 2; }
+        .pn a:last-child { text-align: right; justify-content: flex-end; }
+        .pn small { display: block; font: 700 11px var(--body); letter-spacing: .12em; text-transform: uppercase; color: var(--lemon); margin-bottom: 4px; }
+        .pn b { font: 700 clamp(1.05rem, 1.8vw, 1.4rem)/1.2 var(--head); }
+
+        @media (max-width: 800px) {
+            .det { grid-template-columns: 1fr; } .hero-im { aspect-ratio: 4 / 3; } .pn { grid-template-columns: 1fr; }
+            .pn a:last-child { text-align: left; justify-content: flex-start; }
+            .pg { padding-top: 104px; }
+        }
+        @media (prefers-reduced-motion: reduce) { .blob, .spin-badge svg, .det dl::before { animation: none !important; } .fade { animation: none; opacity: 1; transform: none; } }
+    </style>
+</head>
+<body>
+{% url 'portfolio:index' as home %}
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+    <symbol id="i-gh" viewBox="0 0 24 24"><path d="M12 .5C5.65.5.5 5.65.5 12c0 5.08 3.29 9.39 7.86 10.91.58.1.79-.25.79-.56v-2c-3.2.7-3.87-1.36-3.87-1.36-.52-1.33-1.28-1.69-1.28-1.69-1.05-.72.08-.7.08-.7 1.15.08 1.76 1.19 1.76 1.19 1.03 1.76 2.7 1.25 3.36.96.1-.75.4-1.25.73-1.54-2.55-.29-5.24-1.28-5.24-5.69 0-1.26.45-2.28 1.19-3.09-.12-.29-.52-1.46.11-3.05 0 0 .97-.31 3.17 1.18a11 11 0 0 1 5.78 0c2.2-1.49 3.17-1.18 3.17-1.18.63 1.59.23 2.76.11 3.05.74.81 1.19 1.83 1.19 3.09 0 4.42-2.69 5.39-5.25 5.68.41.36.78 1.06.78 2.14v3.17c0 .31.21.67.8.56A11.51 11.51 0 0 0 23.5 12C23.5 5.65 18.35.5 12 .5Z"/></symbol>
+    <symbol id="i-in" viewBox="0 0 24 24"><path d="M20.45 20.45h-3.56v-5.57c0-1.33-.03-3.04-1.85-3.04-1.86 0-2.14 1.45-2.14 2.94v5.67H9.35V9h3.41v1.56h.05c.48-.9 1.64-1.85 3.37-1.85 3.6 0 4.27 2.37 4.27 5.46v6.28ZM5.34 7.43a2.06 2.06 0 1 1 0-4.12 2.06 2.06 0 0 1 0 4.12ZM7.12 20.45H3.56V9h3.56v11.45ZM22.22 0H1.77C.79 0 0 .77 0 1.73v20.54C0 23.23.79 24 1.77 24h20.45c.98 0 1.78-.77 1.78-1.73V1.73C24 .77 23.2 0 22.22 0Z"/></symbol>
+    <symbol id="i-fb" viewBox="0 0 24 24"><path d="M24 12.07C24 5.4 18.63 0 12 0S0 5.4 0 12.07C0 18.1 4.39 23.1 10.13 24v-8.44H7.08v-3.49h3.05V9.41c0-3.02 1.79-4.7 4.53-4.7 1.31 0 2.69.24 2.69.24v2.97h-1.52c-1.49 0-1.96.93-1.96 1.89v2.26h3.33l-.53 3.49h-2.8V24C19.61 23.1 24 18.1 24 12.07Z"/></symbol>
+    <symbol id="i-ig" viewBox="0 0 24 24"><path d="M12 2.16c3.2 0 3.58.01 4.85.07 3.25.15 4.77 1.69 4.92 4.92.06 1.27.07 1.65.07 4.85s-.01 3.58-.07 4.85c-.15 3.23-1.66 4.77-4.92 4.92-1.27.06-1.64.07-4.85.07s-3.58-.01-4.85-.07c-3.26-.15-4.77-1.7-4.92-4.92-.06-1.27-.07-1.64-.07-4.85s.01-3.58.07-4.85C2.38 3.92 3.9 2.38 7.15 2.23 8.42 2.17 8.8 2.16 12 2.16ZM12 0C8.74 0 8.33.01 7.05.07 2.7.27.27 2.69.07 7.05.01 8.33 0 8.74 0 12s.01 3.67.07 4.95c.2 4.36 2.62 6.78 6.98 6.98C8.33 23.99 8.74 24 12 24s3.67-.01 4.95-.07c4.35-.2 6.78-2.62 6.98-6.98.06-1.28.07-1.69.07-4.95s-.01-3.67-.07-4.95c-.2-4.35-2.62-6.78-6.98-6.98C15.67.01 15.26 0 12 0Zm0 5.84a6.16 6.16 0 1 0 0 12.32 6.16 6.16 0 0 0 0-12.32ZM12 16a4 4 0 1 1 0-8 4 4 0 0 1 0 8Zm6.4-11.85a1.44 1.44 0 1 0 0 2.88 1.44 1.44 0 0 0 0-2.88Z"/></symbol>
+    <symbol id="i-x" viewBox="0 0 24 24"><path d="M18.9 1.15h3.68l-8.04 9.19L24 22.85h-7.4l-5.8-7.58-6.63 7.58H.49l8.6-9.83L0 1.15h7.59l5.24 6.93 6.07-6.93Zm-1.29 19.5h2.04L6.48 3.24H4.3l13.31 17.41Z"/></symbol>
+</svg>
+
+<!-- ================= NAVBAR ================= -->
+<header class="nav" id="nav">
+    <a href="{{ home }}#top" class="logo"><i>{% for w in profile.name.split %}{% if forloop.counter <= 2 %}{{ w|first|upper }}{% endif %}{% endfor %}</i>{{ profile.name }}</a>
+    <nav class="links">
+        <a href="{{ home }}#about">About</a><a href="{{ home }}#timeline">Timeline</a><a href="{{ home }}#skills">Skills</a><a href="{{ home }}#services">Services</a>
+        <a href="{{ home }}#work">Work</a><a href="{{ home }}#stats">Metrics</a><a href="{{ home }}#contact">Contact</a>
+    </nav>
+    <div class="nav-r">
+        {% if profile.resume %}<a href="{{ profile.resume.url }}" target="_blank" rel="noopener" class="btn btn-o rs">Resume <span>↓</span></a>{% endif %}
+        <a href="{{ home }}#contact" class="btn btn-p mag" style="padding:10px 20px;font-size:13px">Let’s talk <span>↗</span></a>
+        <button class="burger" id="bg" type="button" aria-label="Menu"><i></i><i></i><i></i></button>
+    </div>
+</header>
+<div class="menu" id="menu">
+    <h6>Sections</h6>
+    <a href="{{ home }}#about">About</a><a href="{{ home }}#timeline">Timeline</a><a href="{{ home }}#skills">Skills</a><a href="{{ home }}#services">Services</a><a href="{{ home }}#work">Work</a><a href="{{ home }}#stats">Metrics</a><a href="{{ home }}#contact">Contact</a>
+    {% if profile.resume %}<h6>Download</h6><a href="{{ profile.resume.url }}" target="_blank" rel="noopener">Resume ↓</a>{% endif %}
+</div>
+
+<!-- ================= PROJECT ================= -->
+<main class="pg">
+    <span class="blob b1"></span><span class="blob b2"></span>
+    <div class="c">
+        <a class="back fade" href="{% url 'portfolio:projects' %}">← All projects</a>
+        <div class="fade" style="--d:1"><span class="eyebrow">{{ num }} · {{ project.category }}</span></div>
+        <h1 class="ptitle fade" style="--d:2">{{ project.title }}</h1>
+
+        {% if project.image_src %}
+        <div class="hero-im fade" style="--d:3">
+            <span class="num-chip"><b>{{ num }}</b> / {{ project.category }}</span>
+            <img class="bgimg" src="{{ project.image_src }}" alt="" aria-hidden="true">
+            <img class="main" src="{{ project.image_src }}" alt="{{ project.title }}" onerror="this.remove()">
+            <a class="spin-badge" {% if project.link and project.link != "#" %}href="{{ project.link }}" target="_blank" rel="noopener"{% else %}href="#details"{% endif %}>
+                <svg viewBox="0 0 100 100" aria-hidden="true">
+                    <defs><path id="sb" d="M50,50 m-38,0 a38,38 0 1,1 76,0 a38,38 0 1,1 -76,0"/></defs>
+                    <text><textPath href="#sb" textLength="236" lengthAdjust="spacing">{% if project.link and project.link != "#" %}VISIT LIVE • VISIT LIVE • VISIT LIVE •{% else %}SCROLL DOWN • SCROLL DOWN • SCROLL DOWN •{% endif %}</textPath></text>
+                </svg>
+                {% if project.link and project.link != "#" %}↗{% else %}↓{% endif %}
+            </a>
+        </div>
+        {% endif %}
+
+        {% if stack %}
+        <div class="mq flat fade" style="--d:4" aria-hidden="true">
+            <div class="mq-t">
+                {% for t in stack %}<span>{{ t }}</span><i>✦</i>{% endfor %}
+                {% for t in stack %}<span>{{ t }}</span><i>✦</i>{% endfor %}
+                {% for t in stack %}<span>{{ t }}</span><i>✦</i>{% endfor %}
+                {% for t in stack %}<span>{{ t }}</span><i>✦</i>{% endfor %}
+            </div>
+        </div>
+        {% endif %}
+
+        <section class="det fade" id="details" style="--d:5">
+            <dl>
+                <div><dt>Year · Client</dt><dd>{{ project.year_label }}</dd></div>
+                <div><dt>Category</dt><dd>{{ project.category }}</dd></div>
+                <div><dt>Stack</dt><dd style="margin-top:8px">{% for t in stack %}<span class="tag">{{ t }}</span>{% endfor %}</dd></div>
+            </dl>
+            <div>
+                <p class="desc">{{ project.description }}</p>
+                <div class="acts">
+                    {% if project.link and project.link != "#" %}<a class="btn btn-p" href="{{ project.link }}" target="_blank" rel="noopener">Visit live platform <span>↗</span></a>{% endif %}
+                    <a class="btn btn-o" href="{% url 'portfolio:projects' %}">All projects</a>
+                </div>
+            </div>
+        </section>
+
+        <nav class="pn fade" style="--d:6">
+            {% if prev_project %}
+            <a href="{% url 'portfolio:project_detail' prev_project.pk %}">
+                {% if prev_project.image_src %}<img class="bgimg" src="{{ prev_project.image_src }}" alt="" aria-hidden="true" loading="lazy"><img class="main" src="{{ prev_project.image_src }}" alt="" loading="lazy" onerror="this.remove()">{% endif %}
+                <div><small>← Previous</small><b>{{ prev_project.title }}</b></div>
+            </a>
+            {% else %}<span></span>{% endif %}
+            {% if next_project %}
+            <a href="{% url 'portfolio:project_detail' next_project.pk %}">
+                {% if next_project.image_src %}<img class="bgimg" src="{{ next_project.image_src }}" alt="" aria-hidden="true" loading="lazy"><img class="main" src="{{ next_project.image_src }}" alt="" loading="lazy" onerror="this.remove()">{% endif %}
+                <div><small>Next →</small><b>{{ next_project.title }}</b></div>
+            </a>
+            {% else %}<span></span>{% endif %}
+        </nav>
+    </div>
+</main>
+
+<!-- ================= FOOTER ================= -->
+<footer>
+    <div class="c">
+        <div class="fg2">
+            <div><div class="fbig g">{{ profile.name }}</div><p style="color:var(--muted);margin-top:10px;max-width:340px">{{ profile.tagline }}</p>
+                <div class="fsoc">
+                    {% if profile.github_url %}<a href="{{ profile.github_url }}" target="_blank" rel="noopener" class="s-gh"><svg class="ic"><use href="#i-gh"/></svg>GitHub</a>{% endif %}
+                    {% if profile.linkedin_url %}<a href="{{ profile.linkedin_url }}" target="_blank" rel="noopener" class="s-li"><svg class="ic"><use href="#i-in"/></svg>LinkedIn</a>{% endif %}
+                    {% if profile.facebook_url %}<a href="{{ profile.facebook_url }}" target="_blank" rel="noopener" class="s-fb"><svg class="ic"><use href="#i-fb"/></svg>Facebook</a>{% endif %}
+                    {% if profile.instagram_url %}<a href="{{ profile.instagram_url }}" target="_blank" rel="noopener" class="s-ig"><svg class="ic"><use href="#i-ig"/></svg>Instagram</a>{% endif %}
+                    {% if profile.twitter_url %}<a href="{{ profile.twitter_url }}" target="_blank" rel="noopener" class="s-x"><svg class="ic"><use href="#i-x"/></svg>X</a>{% endif %}
+                </div></div>
+            <div><h6>Sections</h6><ul><li><a href="{{ home }}#about">About</a></li><li><a href="{{ home }}#timeline">Timeline</a></li><li><a href="{{ home }}#skills">Skills</a></li><li><a href="{{ home }}#services">Services</a></li><li><a href="{{ home }}#work">Work</a></li><li><a href="{{ home }}#contact">Contact</a></li></ul></div>
+            <div><h6>Full pages</h6><ul>
+                <li><a href="{% url 'portfolio:about' %}">Manifesto</a></li><li><a href="{% url 'portfolio:timeline' %}">Timeline</a></li><li><a href="{% url 'portfolio:skills' %}">Skills</a></li>
+                <li><a href="{% url 'portfolio:services' %}">Services</a></li><li><a href="{% url 'portfolio:projects' %}">Work</a></li><li><a href="{% url 'portfolio:stats' %}">Metrics</a></li><li><a href="{% url 'portfolio:contact_page' %}">Contact</a></li></ul></div>
+        </div>
+        <div class="fb"><span>© 2026 {{ profile.name }}. All rights reserved.</span><a class="top" href="#top" aria-label="Back to top">↑</a></div>
+    </div>
+</footer>
+
+<script>
+(function () {
+    const nav = document.getElementById('nav'), menu = document.getElementById('menu'), bg = document.getElementById('bg');
+    const onScroll = () => nav.classList.toggle('sc', scrollY > 20);
+    addEventListener('scroll', onScroll, { passive: true }); onScroll();
+    bg.addEventListener('click', e => { e.stopPropagation(); bg.classList.toggle('open'); menu.classList.toggle('open'); });
+    menu.querySelectorAll('a').forEach(a => a.addEventListener('click', () => { bg.classList.remove('open'); menu.classList.remove('open'); }));
+})();
+</script>
+</body>
+</html>
