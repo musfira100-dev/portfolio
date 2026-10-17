@@ -4,6 +4,7 @@ from django.utils.html import format_html
 
 from .models import (
     ContactMessage,
+    FAQ,
     Project,
     Service,
     SiteProfile,
@@ -126,6 +127,11 @@ class TimelineEntryAdmin(admin.ModelAdmin):
     list_display = ("year", "title", "order")
     list_editable = ("order",)
 
+@admin.register(FAQ)
+class FAQAdmin(admin.ModelAdmin):
+    list_display = ("question", "order", "is_published")
+    list_editable = ("order", "is_published")
+    search_fields = ("question", "answer")
 
 @admin.register(ContactMessage)
 class ContactMessageAdmin(admin.ModelAdmin):

@@ -73,6 +73,7 @@
 </style>
 
 <div class="sf-wrap" role="contentinfo" id="site-footer">
+    {% if faqs %}
   <div class="sf-top" id="faq"><div class="sf-in"><div class="fq">
     <div class="fq-side">
       <span class="fq-eye">FAQ</span>
@@ -82,33 +83,15 @@
       <button type="button" class="fq-cta" id="fq-ask">Ask me directly <span>&#8599;</span></button>
     </div>
     <div class="fq-list" id="fq-list">
-      <div class="fq-item open">
-        <button type="button" class="fq-q" aria-expanded="true"><span class="fq-n">01</span><span class="fq-t">What kind of work do you take on?</span><span class="fq-i" aria-hidden="true"></span></button>
-        <div class="fq-a"><div><p>I design and build complete web products: business websites, portfolios, dashboards, e-commerce stores and custom management systems, from the database and backend to the final interface.</p></div></div>
+      {% for f in faqs %}
+      <div class="fq-item{% if forloop.first %} open{% endif %}">
+        <button type="button" class="fq-q" aria-expanded="{% if forloop.first %}true{% else %}false{% endif %}"><span class="fq-n">{{ forloop.counter|stringformat:"02d" }}</span><span class="fq-t">{{ f.question }}</span><span class="fq-i" aria-hidden="true"></span></button>
+        <div class="fq-a"><div><p>{{ f.answer|linebreaksbr }}</p></div></div>
       </div>
-      <div class="fq-item">
-        <button type="button" class="fq-q" aria-expanded="false"><span class="fq-n">02</span><span class="fq-t">Which technologies do you use?</span><span class="fq-i" aria-hidden="true"></span></button>
-        <div class="fq-a"><div><p>My main stack is Python and Django on the backend, with modern HTML, CSS and JavaScript on the front. I pick the simplest tools that fit your project, so it stays fast and easy to maintain.</p></div></div>
-      </div>
-      <div class="fq-item">
-        <button type="button" class="fq-q" aria-expanded="false"><span class="fq-n">03</span><span class="fq-t">How long does a project take?</span><span class="fq-i" aria-hidden="true"></span></button>
-        <div class="fq-a"><div><p>A simple website usually takes one to two weeks. Larger systems with logins, dashboards or payments take longer. After I understand your requirements, I give you a clear timeline before any work begins.</p></div></div>
-      </div>
-      <div class="fq-item">
-        <button type="button" class="fq-q" aria-expanded="false"><span class="fq-n">04</span><span class="fq-t">How do we get started?</span><span class="fq-i" aria-hidden="true"></span></button>
-        <div class="fq-a"><div><p>Send me a short message about your idea using the contact form below. We discuss goals, features and budget, I share a plan, and once you approve it, development starts with regular progress updates.</p></div></div>
-      </div>
-      <div class="fq-item">
-        <button type="button" class="fq-q" aria-expanded="false"><span class="fq-n">05</span><span class="fq-t">Do you work with remote and international clients?</span><span class="fq-i" aria-hidden="true"></span></button>
-        <div class="fq-a"><div><p>Yes. I work remotely and stay in touch through email and chat, so location is never a problem.</p></div></div>
-      </div>
-      <div class="fq-item">
-        <button type="button" class="fq-q" aria-expanded="false"><span class="fq-n">06</span><span class="fq-t">Do you offer support after launch?</span><span class="fq-i" aria-hidden="true"></span></button>
-        <div class="fq-a"><div><p>Yes. I help with deployment, fixes and updates after launch, and can keep maintaining the project as it grows.</p></div></div>
-      </div>
+      {% endfor %}
     </div>
   </div></div></div>
-
+  {% endif %}
   <div class="sf-dark"><div class="sf-in">
     <div class="sf-grid">
       <div>

@@ -359,6 +359,19 @@ class TimelineEntry(models.Model):
     def __str__(self):
         return f"{self.year} — {self.title}"
 
+class FAQ(models.Model):
+    question = models.CharField(max_length=250)
+    answer = models.TextField()
+    order = models.PositiveIntegerField(default=0, db_index=True)
+    is_published = models.BooleanField(default=True)
+
+    class Meta:
+        ordering = ["order", "id"]
+        verbose_name = "FAQ"
+        verbose_name_plural = "FAQs"
+
+    def __str__(self):
+        return self.question
 
 class ContactMessage(models.Model):
     name = models.CharField(max_length=120)
