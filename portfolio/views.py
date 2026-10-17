@@ -1,5 +1,5 @@
 import json
-
+import logging
 from django import forms
 from django.conf import settings
 from django.core.mail import EmailMessage
@@ -19,6 +19,14 @@ from .models import (
     TerminalCommand,
     TimelineEntry,
 )
+
+logger = logging.getLogger(__name__)
+
+
+def _client_ip(request):
+    # nginx ke peeche REMOTE_ADDR sab ke liye 127.0.0.1 hota hai, is liye asli IP header se lein
+    xff = request.META.get("HTTP_X_FORWARDED_FOR", "")
+    return xff.split(",")[0].strip() or request.META.get("REMOTE_ADDR", "unknown")
 
 
 def _stats(p):
@@ -87,11 +95,12 @@ class ContactForm(forms.ModelForm):
     class Meta:
         model = ContactMessage
         fields = ("name", "email", "message")
+        
 
 
 @require_POST
 def contact(request):
-    ip = request.META.get("REMOTE_ADDR", "unknown")
+    ip = _client_ip(request)
     key = f"contact:{ip}"
     if cache.get(key, 0) >= 5:  # 5 messages / ghanta / IP
         return JsonResponse({"ok": False, "error": "Too many messages. Try later."}, status=429)
@@ -116,7 +125,8 @@ def contact(request):
             reply_to=[msg.email],
         ).send()
     except Exception:
-        pass  # mail fail ho to bhi form chalta rahe, message database mein save hai
+        # form phir bhi chalta rahe (message database mein save hai), lekin error log mein dikhe
+        logger.exception("Contact email send failed")
 
     return JsonResponse({"ok": True})
 
