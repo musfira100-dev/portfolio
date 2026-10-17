@@ -5,6 +5,7 @@ from django.utils.html import format_html
 from .models import (
     ContactMessage,
     FAQ,
+    ProcessStep,
     Project,
     Service,
     SiteProfile,
@@ -133,6 +134,13 @@ class FAQAdmin(admin.ModelAdmin):
     list_editable = ("order", "is_published")
     search_fields = ("question", "answer")
 
+
+@admin.register(ProcessStep)
+class ProcessStepAdmin(admin.ModelAdmin):
+    list_display = ("title", "icon", "order", "is_published")
+    list_editable = ("order", "is_published")
+    search_fields = ("title", "description")
+    
 @admin.register(ContactMessage)
 class ContactMessageAdmin(admin.ModelAdmin):
     list_display = ("name", "email", "created_at", "is_read")

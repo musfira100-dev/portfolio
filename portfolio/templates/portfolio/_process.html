@@ -1,0 +1,164 @@
+{# Process section: admin > Process steps se edit hota hai #}
+{% if process_steps %}
+<style>
+.pr{--pr-n:{{ process_steps|length }};position:relative;overflow:hidden;color:#eef0ff;background:radial-gradient(900px 460px at 88% 0,rgba(168,128,255,.50),transparent 62%),radial-gradient(760px 420px at 0 100%,rgba(80,120,255,.42),transparent 62%),linear-gradient(180deg,#232b7d,#392a8c)}
+.pr::before{content:"";position:absolute;inset:0;pointer-events:none;background-image:linear-gradient(rgba(255,255,255,.06) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.06) 1px,transparent 1px);background-size:54px 54px;-webkit-mask-image:radial-gradient(ellipse at 50% 40%,#000,transparent 72%);mask-image:radial-gradient(ellipse at 50% 40%,#000,transparent 72%)}
+.pr-orb{position:absolute;border-radius:50%;pointer-events:none;filter:blur(46px);animation:prFloat 14s ease-in-out infinite}
+.pr-orb.a{width:280px;height:280px;left:-80px;top:10%;background:rgba(255,110,160,.34)}
+.pr-orb.b{width:240px;height:240px;right:-60px;bottom:4%;background:rgba(90,130,255,.40);animation-delay:-7s}
+@keyframes prFloat{50%{transform:translate(40px,-34px) scale(1.12)}}
+.pr .c{position:relative;z-index:1}
+.pr.s{padding:clamp(40px,5vw,64px) 0}
+.pr .sh{margin-bottom:clamp(14px,2vw,24px)}
+.pr .title{color:#fff}
+.pr .title .g{background:linear-gradient(120deg,#8fa6ff,#c3a2ff 55%,#ff9cbc);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+.pr .eyebrow{background:rgba(255,255,255,.16);color:#ece4ff}
+.pr-lede{max-width:520px;margin-top:8px;color:#cdd2f6}
+
+.pr-rail{position:relative;overflow-x:auto;overflow-y:hidden;padding:20px 0 2px;scrollbar-width:none}
+.pr-rail::-webkit-scrollbar{display:none}
+.pr-rail-in{position:relative;display:flex;min-width:max(100%,calc(var(--pr-n) * 92px))}
+.pr-line{position:absolute;top:26px;left:calc(50% / var(--pr-n));right:calc(50% / var(--pr-n));height:4px;border-radius:4px;background:rgba(255,255,255,.18)}
+.pr-fill{display:block;height:100%;width:0;border-radius:4px;background:linear-gradient(90deg,#5b7bff,#a07bff,#ff7aa0);box-shadow:0 0 18px rgba(168,128,255,.9);transition:width .7s cubic-bezier(.16,1,.3,1)}
+.pr-node{position:relative;flex:1;min-width:0;display:flex;flex-direction:column;align-items:center;gap:8px;padding:0 4px;border:0;background:none;cursor:pointer;color:#cdd2f6;font:600 12.5px/1.25 var(--body);text-align:center;transition:color .3s}
+.pr-ico{position:relative;width:52px;height:52px;border-radius:17px;display:grid;place-items:center;font-size:22px;font-style:normal;background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.28);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);box-shadow:0 12px 24px -12px rgba(10,10,50,.7),inset 0 1px 0 rgba(255,255,255,.3);transform:perspective(500px) rotateX(14deg);transition:transform .5s cubic-bezier(.16,1,.3,1),background .4s,box-shadow .4s,border-color .4s}
+.pr-node:hover .pr-ico{transform:perspective(500px) rotateX(0) translateY(-5px)}
+.pr-node.done .pr-ico{border-color:rgba(190,160,255,.8);background:rgba(168,128,255,.32)}
+.pr-node.on{color:#fff}
+.pr-node.on .pr-ico{background:linear-gradient(135deg,#4f72ff,#9a74ff 55%,#ff6f9c);border-color:transparent;transform:perspective(500px) rotateX(0) translateY(-6px) scale(1.1);box-shadow:0 0 0 5px rgba(190,160,255,.28),0 0 30px rgba(168,128,255,.85),0 18px 34px -14px rgba(10,10,50,.8)}
+.pr-node:focus-visible{outline:2px solid #c9b3ff;outline-offset:4px;border-radius:14px}
+
+.pr-stage{perspective:1400px;margin-top:20px}
+.pr-panel{position:relative;transform-style:preserve-3d;transition:transform .25s ease-out;will-change:transform;border-radius:26px;padding:clamp(18px,2.6vw,30px);background:linear-gradient(135deg,rgba(255,255,255,.20),rgba(255,255,255,.08));border:1px solid rgba(255,255,255,.26);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);box-shadow:0 30px 60px -30px rgba(10,10,50,.7),0 0 0 1px rgba(168,128,255,.16),inset 0 1px 0 rgba(255,255,255,.3);overflow:hidden}
+.pr-panel::before{content:"";position:absolute;inset:0;pointer-events:none;background:radial-gradient(420px circle at var(--mx,70%) var(--my,0%),rgba(255,255,255,.20),transparent 60%)}
+.pr-panel::after{content:"";position:absolute;left:0;right:0;top:0;height:3px;background:linear-gradient(90deg,#5b7bff,#a07bff,#ff7aa0);box-shadow:0 0 22px rgba(168,128,255,.9)}
+.pr-cards{position:relative;display:grid}
+.pr-card{grid-area:1/1;display:grid;grid-template-columns:auto 1fr;gap:clamp(16px,3vw,36px);align-items:center;opacity:0;visibility:hidden;transform:translateZ(-60px) rotateY(10deg);transition:opacity .5s ease,transform .7s cubic-bezier(.16,1,.3,1),visibility 0s .5s}
+.pr-card.on{opacity:1;visibility:visible;transform:none;transition:opacity .5s ease .1s,transform .7s cubic-bezier(.16,1,.3,1) .1s,visibility 0s}
+.pr-big{font:800 clamp(3.4rem,7.5vw,5.6rem)/.9 var(--head);letter-spacing:-.05em;color:transparent;background:linear-gradient(135deg,#6f8aff,#b08cff 55%,#ff86ab);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;filter:drop-shadow(0 0 22px rgba(168,128,255,.6));transform:translateZ(60px)}
+.pr-body{transform:translateZ(30px)}
+.pr-body h3{font:800 clamp(1.3rem,2.4vw,1.8rem)/1.1 var(--head);letter-spacing:-.02em;color:#fff}
+.pr-body p{margin-top:8px;max-width:560px;color:#dde0fb;font-size:14.5px;line-height:1.65}
+.pr-pts{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px;list-style:none}
+.pr-pts li{padding:6px 13px;border-radius:99px;font:600 12px var(--body);color:#f2f3ff;background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.24);box-shadow:0 0 16px -6px rgba(168,128,255,.7)}
+.pr-pts li::before{content:"✓";margin-right:7px;color:#5ff0b0}
+.pr-ctl{position:relative;display:flex;align-items:center;justify-content:space-between;gap:14px;margin-top:16px;padding-top:14px;border-top:1px solid rgba(255,255,255,.18)}
+.pr-count{font:600 12.5px var(--body);letter-spacing:.1em;text-transform:uppercase;color:#cdd2f6}
+.pr-count b{color:#fff}
+.pr-btns{display:flex;gap:10px}
+.pr-btn{width:40px;height:40px;border-radius:50%;border:1px solid rgba(255,255,255,.3);background:rgba(255,255,255,.14);color:#fff;font-size:16px;cursor:pointer;transition:transform .25s,background .25s,box-shadow .25s}
+.pr-btn:hover{transform:translateY(-3px);background:linear-gradient(135deg,#4f72ff,#9a74ff 55%,#ff6f9c);box-shadow:0 0 24px rgba(168,128,255,.8)}
+@media(max-width:720px){
+  .pr-card{grid-template-columns:1fr;gap:6px}
+  .pr-big{font-size:clamp(2.8rem,15vw,4rem)}
+  .pr-node{font-size:11.5px}
+  .pr-ico{width:48px;height:48px;font-size:20px}
+  .pr-line{top:24px}
+}
+@media(prefers-reduced-motion:reduce){.pr-orb{animation:none}.pr-card,.pr-card.on,.pr-fill,.pr-ico,.pr-panel{transition:none}}
+</style>
+
+<section class="s pr" id="process">
+    <span class="pr-orb a"></span><span class="pr-orb b"></span>
+    <div class="c">
+        <div class="sh rv"><div>
+            <span class="eyebrow">Process</span>
+            <h2 class="title">How I <span class="g">work</span></h2>
+            <p class="pr-lede">From the first idea to a live product, every project follows the same clear path.</p>
+        </div></div>
+
+        <div class="rv">
+            <div class="pr-rail" id="pr-rail"><div class="pr-rail-in">
+                <span class="pr-line"><i class="pr-fill" id="pr-fill"></i></span>
+                {% for s in process_steps %}
+                <button type="button" class="pr-node{% if forloop.first %} on{% endif %}" data-i="{{ forloop.counter0 }}"{% if forloop.first %} aria-current="step"{% endif %}>
+                    <span class="pr-ico">{% if s.icon %}{{ s.icon }}{% else %}{{ forloop.counter }}{% endif %}</span>
+                    <span>{{ s.title }}</span>
+                </button>
+                {% endfor %}
+            </div></div>
+
+            <div class="pr-stage">
+                <div class="pr-panel" id="pr-panel">
+                    <div class="pr-cards">
+                        {% for s in process_steps %}
+                        <article class="pr-card{% if forloop.first %} on{% endif %}" data-i="{{ forloop.counter0 }}">
+                            <div class="pr-big">{{ forloop.counter|stringformat:"02d" }}</div>
+                            <div class="pr-body">
+                                <h3>{{ s.title }}</h3>
+                                <p>{{ s.description|linebreaksbr }}</p>
+                                {% if s.point_list %}<ul class="pr-pts">{% for pt in s.point_list %}<li>{{ pt }}</li>{% endfor %}</ul>{% endif %}
+                            </div>
+                        </article>
+                        {% endfor %}
+                    </div>
+                    <div class="pr-ctl">
+                        <span class="pr-count">Step <b id="pr-cur">1</b> / {{ process_steps|length }}</span>
+                        <div class="pr-btns">
+                            <button type="button" class="pr-btn" id="pr-prev" aria-label="Previous step">←</button>
+                            <button type="button" class="pr-btn" id="pr-next" aria-label="Next step">→</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<script>
+(function () {
+    var root = document.getElementById('process');
+    if (!root) return;
+    var nodes = [].slice.call(root.querySelectorAll('.pr-node'));
+    var cards = [].slice.call(root.querySelectorAll('.pr-card'));
+    var fill = document.getElementById('pr-fill'), cur = document.getElementById('pr-cur');
+    var rail = document.getElementById('pr-rail'), panel = document.getElementById('pr-panel');
+    var n = nodes.length, i = 0, timer = null, stopped = false;
+    var calm = matchMedia('(prefers-reduced-motion: reduce)').matches;
+    var fine = matchMedia('(hover: hover) and (pointer: fine)').matches;
+
+    function go(k) {
+        i = (k + n) % n;
+        nodes.forEach(function (el, j) {
+            el.classList.toggle('on', j === i);
+            el.classList.toggle('done', j < i);
+            if (j === i) el.setAttribute('aria-current', 'step'); else el.removeAttribute('aria-current');
+        });
+        cards.forEach(function (el, j) { el.classList.toggle('on', j === i); });
+        fill.style.width = (n > 1 ? (i / (n - 1)) * 100 : 0) + '%';
+        cur.textContent = i + 1;
+        if (rail.scrollWidth > rail.clientWidth + 2) {
+            rail.scrollTo({ left: nodes[i].offsetLeft - (rail.clientWidth - nodes[i].offsetWidth) / 2, behavior: 'smooth' });
+        }
+    }
+    function stop() { stopped = true; clearInterval(timer); }
+    function user(k) { stop(); go(k); }
+
+    nodes.forEach(function (el, j) { el.addEventListener('click', function () { user(j); }); });
+    document.getElementById('pr-prev').addEventListener('click', function () { user(i - 1); });
+    document.getElementById('pr-next').addEventListener('click', function () { user(i + 1); });
+    go(0);
+
+    if (fine && !calm) {
+        panel.addEventListener('pointermove', function (e) {
+            var r = panel.getBoundingClientRect(), x = (e.clientX - r.left) / r.width, y = (e.clientY - r.top) / r.height;
+            panel.style.transform = 'rotateY(' + ((x - .5) * 7).toFixed(2) + 'deg) rotateX(' + ((.5 - y) * 5).toFixed(2) + 'deg)';
+            panel.style.setProperty('--mx', (x * 100).toFixed(1) + '%');
+            panel.style.setProperty('--my', (y * 100).toFixed(1) + '%');
+        });
+        panel.addEventListener('pointerleave', function () { panel.style.transform = ''; });
+    }
+
+    if (!calm && 'IntersectionObserver' in window && n > 1) {
+        var hover = false;
+        panel.addEventListener('pointerenter', function () { hover = true; });
+        panel.addEventListener('pointerleave', function () { hover = false; });
+        new IntersectionObserver(function (es, obs) {
+            if (!es[0].isIntersecting || stopped) return;
+            obs.disconnect();
+            timer = setInterval(function () { if (!hover && !stopped) go(i + 1); }, 4800);
+        }, { threshold: .35 }).observe(root);
+    }
+})();
+</script>
+{% endif %}

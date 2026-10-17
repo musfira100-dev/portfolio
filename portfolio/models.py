@@ -373,6 +373,30 @@ class FAQ(models.Model):
     def __str__(self):
         return self.question
 
+class ProcessStep(models.Model):
+    title = models.CharField(max_length=80)
+    description = models.TextField()
+    icon = models.CharField(
+        max_length=8, blank=True,
+        help_text="Ek emoji, jaise 🧭 (khali chhodein to step ka number dikhega)",
+    )
+    points = models.TextField(
+        blank=True, help_text="Optional. Har line mein ek point likhein.",
+    )
+    order = models.PositiveIntegerField(default=0, db_index=True)
+    is_published = models.BooleanField(default=True)
+
+    class Meta:
+        ordering = ["order", "id"]
+        verbose_name = "Process step"
+        verbose_name_plural = "Process steps"
+
+    def __str__(self):
+        return self.title
+
+    def point_list(self):
+        return [p.strip() for p in self.points.splitlines() if p.strip()]    
+
 class ContactMessage(models.Model):
     name = models.CharField(max_length=120)
     email = models.EmailField()

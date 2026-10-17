@@ -11,6 +11,7 @@ from django.views.decorators.http import require_POST
 
 from .models import (
     ContactMessage,
+    ProcessStep,
     Project,
     Service,
     SiteProfile,
@@ -83,6 +84,7 @@ def index(request):
         "entries": TimelineEntry.objects.all(),
         "groups": list(groups.items()),
         "services": list(enumerate(Service.objects.filter(is_published=True), 1)),
+        "process_steps": list(ProcessStep.objects.filter(is_published=True)),
         "projects": list(enumerate(Project.objects.filter(is_published=True), 1)),
         "stats": _stats(p),
         "keywords": [k.strip() for k in p.hero_keywords.split("•") if k.strip()],
