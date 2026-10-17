@@ -119,11 +119,12 @@ def contact(request):
 
     try:
         EmailMessage(
-            subject=f"Portfolio message from {msg.name}",
+            subject=f"Portfolio message #{msg.pk} from {msg.name}",
             body=f"Name: {msg.name}\nEmail: {msg.email}\n\n{msg.message}",
             to=[settings.CONTACT_NOTIFY_EMAIL],
             reply_to=[msg.email],
         ).send()
+        logger.info("Contact email sent for message #%s", msg.pk)
     except Exception:
         # form phir bhi chalta rahe (message database mein save hai), lekin error log mein dikhe
         logger.exception("Contact email send failed")
