@@ -261,62 +261,7 @@
     </div>
 </main>
 
-<!-- ================= FOOTER ================= -->
-<footer>
-    <div class="c">
-        <div class="fg2">
-            <div>
-                <div class="fbig g">{{ profile.name }}</div>
-                <p style="color:var(--muted);margin-top:10px;max-width:340px">{{ profile.tagline }}</p>
-                <div class="fsoc">
-                    {% if profile.github_url %}<a href="{{ profile.github_url }}" target="_blank" rel="noopener" class="s-gh"><svg class="ic"><use href="#i-gh"/></svg>GitHub</a>{% endif %}
-                    {% if profile.linkedin_url %}<a href="{{ profile.linkedin_url }}" target="_blank" rel="noopener" class="s-li"><svg class="ic"><use href="#i-in"/></svg>LinkedIn</a>{% endif %}
-                    {% if profile.facebook_url %}<a href="{{ profile.facebook_url }}" target="_blank" rel="noopener" class="s-fb"><svg class="ic"><use href="#i-fb"/></svg>Facebook</a>{% endif %}
-                    {% if profile.instagram_url %}<a href="{{ profile.instagram_url }}" target="_blank" rel="noopener" class="s-ig"><svg class="ic"><use href="#i-ig"/></svg>Instagram</a>{% endif %}
-                    {% if profile.twitter_url %}<a href="{{ profile.twitter_url }}" target="_blank" rel="noopener" class="s-x"><svg class="ic"><use href="#i-x"/></svg>X</a>{% endif %}
-                </div>
-            </div>
-
-            <div>
-                <h6>Sections</h6>
-                <ul>
-                    <li><a href="{{ home }}#about">About</a></li>
-                    <li><a href="{{ home }}#timeline">Timeline</a></li>
-                    <li><a href="{{ home }}#skills">Skills</a></li>
-                    <li><a href="{{ home }}#services">Services</a></li>
-                    <li><a href="{{ home }}#work">Work</a></li>
-                    <li><a href="{{ home }}#contact">Contact</a></li>
-                </ul>
-            </div>
-
-            <div>
-                <h6>Full pages</h6>
-                <ul>
-                    <li><a href="{% url 'portfolio:about' %}">Manifesto</a></li>
-                    <li><a href="{% url 'portfolio:timeline' %}">Timeline</a></li>
-                    <li><a href="{% url 'portfolio:skills' %}">Skills</a></li>
-                    <li><a href="{% url 'portfolio:services' %}">Services</a></li>
-                    <li><a href="{% url 'portfolio:projects' %}">Work</a></li>
-                    <li><a href="{% url 'portfolio:stats' %}">Metrics</a></li>
-                    <li><a href="{% url 'portfolio:contact_page' %}">Contact</a></li>
-                </ul>
-            </div>
-
-            <div class="term" aria-label="Status">
-                <div class="tb"><i></i><i></i><i></i><span>musfira@portfolio</span></div>
-                <div class="tbody">
-                    <p><span class="pr">$</span>musfira --status</p>
-                    <p><span class="ok">[✓]</span>System Online &amp; Active</p>
-                    <p><span class="ok">[✓]</span>Stack: Django, Python, Tailwind</p>
-                    <p><span class="ok">[✓]</span>Role: Creative System Architect</p>
-                    <p class="gp"><span class="pr">$</span>ping --availability</p>
-                    <p>Response: Available for Work 🟢<span class="cur"></span></p>
-                </div>
-            </div>
-        </div>
-        <div class="fb"><span>© 2026 {{ profile.name }}. All rights reserved.</span><a class="top" href="#top" aria-label="Back to top">↑</a></div>
-    </div>
-</footer>
+{% include 'portfolio/_footer.html' %}
 
 <script>
 (function () {

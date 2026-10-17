@@ -1,0 +1,202 @@
+{# Shared footer: landing page + project detail #}
+<style>
+.sf-wrap{--sf-g:linear-gradient(120deg,#3B5BFF,#8A5CFF 55%,#FF5C8A);font-family:'Plus Jakarta Sans',system-ui,sans-serif}
+.sf-wrap *{box-sizing:border-box}
+.sf-top{position:relative;overflow:hidden;padding:84px 0 90px;background:#fff;border-top:1px solid rgba(14,17,48,.09)}
+.sf-top::before{content:"";position:absolute;inset:0;pointer-events:none;background-image:radial-gradient(rgba(59,91,255,.13) 1.2px,transparent 1.2px);background-size:26px 26px;-webkit-mask-image:radial-gradient(ellipse at 20% 30%,#000,transparent 70%);mask-image:radial-gradient(ellipse at 20% 30%,#000,transparent 70%)}
+.sf-top::after{content:"";position:absolute;width:420px;height:420px;right:-120px;bottom:-160px;border-radius:50%;background:radial-gradient(circle,rgba(138,92,255,.22),rgba(255,92,138,.08) 55%,transparent 72%);filter:blur(30px);pointer-events:none}
+.fq{position:relative;z-index:1;display:grid;grid-template-columns:.85fr 1.15fr;gap:clamp(30px,6vw,84px);align-items:start}
+.fq-side{position:sticky;top:110px}
+.fq-eye{display:inline-block;padding:6px 14px;border-radius:99px;background:rgba(138,92,255,.12);color:#8A5CFF;font:700 12px 'Plus Jakarta Sans',sans-serif;letter-spacing:.12em;text-transform:uppercase}
+.fq-title{margin:16px 0 14px;font:800 clamp(2rem,4.2vw,3.2rem)/1.05 'Sora',system-ui,sans-serif;letter-spacing:-.03em;color:#0E1130}
+.fq-title span{background:var(--sf-g);-webkit-background-clip:text;background-clip:text;color:transparent;-webkit-text-fill-color:transparent}
+.fq-lede{max-width:380px;color:#5C6285;font-size:15px;line-height:1.7}
+.fq-help{margin-top:26px;display:flex;align-items:center;gap:14px;padding:14px 16px;max-width:380px;border-radius:18px;background:#fff;border:1px solid rgba(14,17,48,.09);box-shadow:0 20px 44px -26px rgba(59,91,255,.45)}
+.fq-help i{flex:none;width:42px;height:42px;border-radius:50%;display:grid;place-items:center;font-style:normal;font-size:19px;color:#fff;background:var(--sf-g)}
+.fq-help b{display:block;font:700 14px 'Sora',sans-serif;color:#0E1130}
+.fq-help small{color:#5C6285;font-size:12.5px}
+.fq-cta{margin-top:18px;display:inline-flex;align-items:center;gap:10px;border:0;cursor:pointer;padding:13px 24px;border-radius:99px;color:#fff;font:600 14px 'Plus Jakarta Sans',sans-serif;background:var(--sf-g);box-shadow:0 16px 34px -12px rgba(110,80,255,.7);transition:transform .25s,box-shadow .25s}
+.fq-cta:hover{transform:translateY(-3px);box-shadow:0 22px 44px -12px rgba(110,80,255,.85)}
+.fq-list{display:grid;gap:14px}
+.fq-item{position:relative;border-radius:20px;background:#fff;border:1px solid rgba(14,17,48,.09);box-shadow:0 14px 34px -26px rgba(40,50,140,.5);transition:transform .35s cubic-bezier(.16,1,.3,1),box-shadow .35s,border-color .3s}
+.fq-item::before{content:"";position:absolute;left:0;top:18px;bottom:18px;width:4px;border-radius:0 4px 4px 0;background:var(--sf-g);transform:scaleY(0);transform-origin:center;transition:transform .4s cubic-bezier(.16,1,.3,1)}
+.fq-item:hover{transform:translateY(-3px);border-color:rgba(138,92,255,.35)}
+.fq-item.open{border-color:rgba(138,92,255,.45);box-shadow:0 28px 60px -30px rgba(59,91,255,.5)}
+.fq-item.open::before{transform:scaleY(1)}
+.fq-q{width:100%;display:flex;align-items:center;gap:16px;padding:20px 22px;border:0;background:none;cursor:pointer;text-align:left;color:#0E1130;font:700 clamp(.98rem,1.4vw,1.1rem)/1.35 'Sora',system-ui,sans-serif}
+.fq-n{flex:none;width:36px;font:800 13px 'Sora',sans-serif;letter-spacing:.06em;color:#b7bbd6;transition:color .3s}
+.fq-item.open .fq-n{background:var(--sf-g);-webkit-background-clip:text;background-clip:text;color:transparent;-webkit-text-fill-color:transparent}
+.fq-t{flex:1}
+.fq-i{position:relative;flex:none;width:34px;height:34px;border-radius:50%;background:rgba(138,92,255,.1);transition:background .3s,transform .4s cubic-bezier(.16,1,.3,1)}
+.fq-i::before,.fq-i::after{content:"";position:absolute;left:50%;top:50%;width:12px;height:2px;margin:-1px 0 0 -6px;border-radius:2px;background:#8A5CFF;transition:transform .4s cubic-bezier(.16,1,.3,1),background .3s}
+.fq-i::after{transform:rotate(90deg)}
+.fq-item.open .fq-i{background:var(--sf-g);transform:rotate(180deg)}
+.fq-item.open .fq-i::before,.fq-item.open .fq-i::after{background:#fff}
+.fq-item.open .fq-i::after{transform:rotate(0)}
+.fq-a{display:grid;grid-template-rows:0fr;transition:grid-template-rows .45s cubic-bezier(.16,1,.3,1)}
+.fq-item.open .fq-a{grid-template-rows:1fr}
+.fq-a>div{overflow:hidden}
+.fq-a p{padding:0 24px 22px 74px;color:#5C6285;font-size:14.5px;line-height:1.75}
+.fq-q:focus-visible{outline:2px solid #8A5CFF;outline-offset:-2px;border-radius:20px}
+@media(max-width:900px){.fq{grid-template-columns:1fr}.fq-side{position:static}}
+@media(max-width:560px){.sf-top{padding:60px 0 64px}.fq-q{padding:16px;gap:12px}.fq-a p{padding:0 18px 18px 18px}.fq-n{width:26px}}
+@media(prefers-reduced-motion:reduce){.fq-item,.fq-a,.fq-i,.fq-i::before,.fq-i::after,.fq-item::before{transition:none}}
+.sf-in{width:min(1180px,calc(100% - 40px));margin:0 auto}
+.sf-dark{position:relative;overflow:hidden;color:#e8eaff;padding:56px 0 30px;background:radial-gradient(900px 420px at 85% 0,rgba(138,92,255,.35),transparent 60%),radial-gradient(700px 400px at 0 100%,rgba(59,91,255,.28),transparent 60%),linear-gradient(180deg,#0b1030,#140c36)}
+.sf-dark::before{content:"";position:absolute;inset:0;pointer-events:none;background-image:radial-gradient(1.2px 1.2px at 20% 80%,rgba(255,255,255,.55),transparent),radial-gradient(1px 1px at 60% 90%,rgba(255,255,255,.45),transparent),radial-gradient(1.4px 1.4px at 80% 70%,rgba(255,255,255,.5),transparent),radial-gradient(1px 1px at 35% 95%,rgba(255,255,255,.4),transparent);background-size:340px 220px;opacity:.7}
+.sf-grid{position:relative;display:grid;grid-template-columns:1fr 1fr 1.4fr;gap:28px;align-items:start}
+.sf-wrap h6{margin:0 0 14px;font:700 12px 'Plus Jakarta Sans',sans-serif;letter-spacing:.14em;text-transform:uppercase;color:#8d95c4}
+.sf-list{list-style:none;margin:0;padding:8px;display:grid;grid-template-columns:1fr 1fr;gap:4px 14px;border-radius:14px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px)}
+.sf-list li{list-style:none;margin:0}
+.sf-list a{display:block;padding:9px 12px;border-radius:10px;color:#e8eaff;text-decoration:none;font-weight:500;font-size:14px;transition:background .25s,transform .25s}
+.sf-list a:hover{background:rgba(138,92,255,.28);transform:translateX(3px)}
+.sf-card{padding:20px;border-radius:18px;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.12);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px)}
+.sf-card h5{margin:0 0 14px;font:600 20px 'Sora',sans-serif;color:#fff}
+.sf-row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.sf-card input,.sf-card textarea{width:100%;padding:11px 13px;border-radius:10px;border:1px solid rgba(255,255,255,.14);background:rgba(8,10,32,.55);color:#fff;font:14px 'Plus Jakarta Sans',sans-serif;outline:0;transition:border-color .25s,box-shadow .25s}
+.sf-card textarea{margin-top:10px;min-height:86px;resize:vertical}
+.sf-card input::placeholder,.sf-card textarea::placeholder{color:#7d84b8}
+.sf-card input:focus,.sf-card textarea:focus{border-color:#8A5CFF;box-shadow:0 0 0 3px rgba(138,92,255,.3)}
+.sf-send{margin-top:12px;border:0;cursor:pointer;padding:10px 22px;border-radius:10px;color:#fff;font:600 14px 'Plus Jakarta Sans',sans-serif;background:var(--sf-g);box-shadow:0 12px 26px -10px rgba(110,80,255,.8);transition:transform .25s}
+.sf-send:hover{transform:translateY(-2px)}.sf-send:disabled{opacity:.6;cursor:wait}
+.sf-msg{display:inline-block;margin-left:12px;font-size:13px}
+.sf-bot{position:relative;display:flex;align-items:center;justify-content:space-between;gap:16px;margin-top:40px;padding-top:22px;border-top:1px solid rgba(255,255,255,.1)}
+.sf-ico{display:flex;gap:10px}
+.sf-ico a{width:34px;height:34px;border-radius:50%;display:grid;place-items:center;color:#cfd6ff;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.12);transition:.25s}
+.sf-ico a:hover{background:rgba(138,92,255,.4);color:#fff;transform:translateY(-2px)}
+.sf-ico svg{width:15px;height:15px;fill:currentColor}
+.sf-copy{font-size:13px;color:#aab1e0;text-align:center;flex:1}
+.sf-up{width:46px;height:46px;border-radius:50%;display:grid;place-items:center;color:#fff;text-decoration:none;font-size:18px;background:var(--sf-g);box-shadow:0 0 0 6px rgba(138,92,255,.18),0 0 26px rgba(138,92,255,.7);transition:transform .25s}
+.sf-up:hover{transform:translateY(-4px)}
+@media(max-width:900px){.sf-grid{grid-template-columns:1fr 1fr}.sf-card{grid-column:1/-1}}
+@media(max-width:560px){.sf-grid{grid-template-columns:1fr}.sf-row{grid-template-columns:1fr}.sf-bot{flex-wrap:wrap;justify-content:center}.sf-copy{order:3;flex-basis:100%}}
+</style>
+
+<div class="sf-wrap" role="contentinfo" id="site-footer">
+  <div class="sf-top" id="faq"><div class="sf-in"><div class="fq">
+    <div class="fq-side">
+      <span class="fq-eye">FAQ</span>
+      <h2 class="fq-title">Questions, <span>answered.</span></h2>
+      <p class="fq-lede">Everything you may want to know before we start working together. Can&rsquo;t find your answer? Just send me a message.</p>
+      <div class="fq-help"><i>&#9993;</i><div><b>Still have a question?</b><small>I usually reply within a day.</small></div></div>
+      <button type="button" class="fq-cta" id="fq-ask">Ask me directly <span>&#8599;</span></button>
+    </div>
+    <div class="fq-list" id="fq-list">
+      <div class="fq-item open">
+        <button type="button" class="fq-q" aria-expanded="true"><span class="fq-n">01</span><span class="fq-t">What kind of work do you take on?</span><span class="fq-i" aria-hidden="true"></span></button>
+        <div class="fq-a"><div><p>I design and build complete web products: business websites, portfolios, dashboards, e-commerce stores and custom management systems, from the database and backend to the final interface.</p></div></div>
+      </div>
+      <div class="fq-item">
+        <button type="button" class="fq-q" aria-expanded="false"><span class="fq-n">02</span><span class="fq-t">Which technologies do you use?</span><span class="fq-i" aria-hidden="true"></span></button>
+        <div class="fq-a"><div><p>My main stack is Python and Django on the backend, with modern HTML, CSS and JavaScript on the front. I pick the simplest tools that fit your project, so it stays fast and easy to maintain.</p></div></div>
+      </div>
+      <div class="fq-item">
+        <button type="button" class="fq-q" aria-expanded="false"><span class="fq-n">03</span><span class="fq-t">How long does a project take?</span><span class="fq-i" aria-hidden="true"></span></button>
+        <div class="fq-a"><div><p>A simple website usually takes one to two weeks. Larger systems with logins, dashboards or payments take longer. After I understand your requirements, I give you a clear timeline before any work begins.</p></div></div>
+      </div>
+      <div class="fq-item">
+        <button type="button" class="fq-q" aria-expanded="false"><span class="fq-n">04</span><span class="fq-t">How do we get started?</span><span class="fq-i" aria-hidden="true"></span></button>
+        <div class="fq-a"><div><p>Send me a short message about your idea using the contact form below. We discuss goals, features and budget, I share a plan, and once you approve it, development starts with regular progress updates.</p></div></div>
+      </div>
+      <div class="fq-item">
+        <button type="button" class="fq-q" aria-expanded="false"><span class="fq-n">05</span><span class="fq-t">Do you work with remote and international clients?</span><span class="fq-i" aria-hidden="true"></span></button>
+        <div class="fq-a"><div><p>Yes. I work remotely and stay in touch through email and chat, so location is never a problem.</p></div></div>
+      </div>
+      <div class="fq-item">
+        <button type="button" class="fq-q" aria-expanded="false"><span class="fq-n">06</span><span class="fq-t">Do you offer support after launch?</span><span class="fq-i" aria-hidden="true"></span></button>
+        <div class="fq-a"><div><p>Yes. I help with deployment, fixes and updates after launch, and can keep maintaining the project as it grows.</p></div></div>
+      </div>
+    </div>
+  </div></div></div>
+
+  <div class="sf-dark"><div class="sf-in">
+    <div class="sf-grid">
+      <div>
+        <h6>Sections</h6>
+        <ul class="sf-list">
+          <li><a href="{% url 'portfolio:index' %}#about">About</a></li>
+          <li><a href="{% url 'portfolio:index' %}#timeline">Timeline</a></li>
+          <li><a href="{% url 'portfolio:index' %}#skills">Skills</a></li>
+          <li><a href="{% url 'portfolio:index' %}#services">Services</a></li>
+          <li><a href="{% url 'portfolio:index' %}#work">Work</a></li>
+          <li><a href="{% url 'portfolio:index' %}#contact">Contact</a></li>
+        </ul>
+      </div>
+      <div>
+        <h6>Full pages</h6>
+        <ul class="sf-list">
+          <li><a href="{% url 'portfolio:about' %}">Manifesto</a></li>
+          <li><a href="{% url 'portfolio:timeline' %}">Timeline</a></li>
+          <li><a href="{% url 'portfolio:skills' %}">Skills</a></li>
+          <li><a href="{% url 'portfolio:services' %}">Services</a></li>
+          <li><a href="{% url 'portfolio:projects' %}">Work</a></li>
+          <li><a href="{% url 'portfolio:stats' %}">Metrics</a></li>
+          <li><a href="{% url 'portfolio:contact_page' %}">Contact</a></li>
+        </ul>
+      </div>
+      <div class="sf-card">
+        <h5>Get in touch</h5>
+        <form id="sf-form" data-url="{% url 'portfolio:contact' %}" data-csrf="{{ csrf_token }}" novalidate>
+          <div class="sf-row">
+            <input name="name" placeholder="Name" required maxlength="120" aria-label="Name">
+            <input name="email" type="email" placeholder="Email" required aria-label="Email">
+          </div>
+          <textarea name="message" placeholder="Message" required aria-label="Message"></textarea>
+          <button class="sf-send" type="submit">Send</button><span class="sf-msg" id="sf-msg" aria-live="polite"></span>
+        </form>
+      </div>
+    </div>
+
+    <div class="sf-bot">
+      <div class="sf-ico">
+        {% if profile.github_url %}<a href="{{ profile.github_url }}" target="_blank" rel="noopener" aria-label="GitHub"><svg viewBox="0 0 24 24"><path d="M12 .5a11.5 11.5 0 0 0-3.64 22.41c.58.1.79-.25.79-.56v-2c-3.2.7-3.88-1.37-3.88-1.37-.52-1.33-1.28-1.69-1.28-1.69-1.05-.72.08-.7.08-.7 1.16.08 1.77 1.19 1.77 1.19 1.03 1.77 2.7 1.26 3.36.96.1-.75.4-1.26.73-1.55-2.55-.29-5.24-1.28-5.24-5.69 0-1.26.45-2.29 1.19-3.1-.12-.29-.52-1.46.11-3.05 0 0 .97-.31 3.18 1.18a11 11 0 0 1 5.78 0c2.21-1.49 3.18-1.18 3.18-1.18.63 1.59.23 2.76.11 3.05.74.81 1.19 1.84 1.19 3.1 0 4.42-2.7 5.4-5.27 5.68.41.36.78 1.06.78 2.14v3.17c0 .31.21.67.8.56A11.5 11.5 0 0 0 12 .5Z"/></svg></a>{% endif %}
+        {% if profile.linkedin_url %}<a href="{{ profile.linkedin_url }}" target="_blank" rel="noopener" aria-label="LinkedIn"><svg viewBox="0 0 24 24"><path d="M20.45 20.45h-3.56v-5.57c0-1.33-.03-3.04-1.85-3.04-1.86 0-2.14 1.45-2.14 2.94v5.67H9.35V9h3.41v1.56h.05c.48-.9 1.64-1.85 3.37-1.85 3.6 0 4.27 2.37 4.27 5.46v6.28ZM5.34 7.43a2.06 2.06 0 1 1 0-4.12 2.06 2.06 0 0 1 0 4.12ZM7.12 20.45H3.56V9h3.56v11.45ZM22.22 0H1.77C.79 0 0 .77 0 1.73v20.54C0 23.23.79 24 1.77 24h20.45c.98 0 1.78-.77 1.78-1.73V1.73C24 .77 23.2 0 22.22 0Z"/></svg></a>{% endif %}
+        {% if profile.twitter_url %}<a href="{{ profile.twitter_url }}" target="_blank" rel="noopener" aria-label="X"><svg viewBox="0 0 24 24"><path d="M18.9 1.15h3.68l-8.04 9.19L24 22.85h-7.4l-5.8-7.58-6.64 7.58H.47l8.6-9.83L0 1.15h7.59l5.24 6.93 6.07-6.93Zm-1.29 19.5h2.04L6.48 3.24H4.3l13.31 17.41Z"/></svg></a>{% endif %}
+        {% if profile.facebook_url %}<a href="{{ profile.facebook_url }}" target="_blank" rel="noopener" aria-label="Facebook"><svg viewBox="0 0 24 24"><path d="M24 12.07C24 5.4 18.63 0 12 0S0 5.4 0 12.07C0 18.1 4.39 23.1 10.13 24v-8.44H7.08v-3.49h3.05V9.41c0-3.02 1.79-4.69 4.53-4.69 1.31 0 2.69.24 2.69.24v2.97h-1.52c-1.49 0-1.96.93-1.96 1.89v2.25h3.33l-.53 3.49h-2.8V24C19.61 23.1 24 18.1 24 12.07Z"/></svg></a>{% endif %}
+        {% if profile.instagram_url %}<a href="{{ profile.instagram_url }}" target="_blank" rel="noopener" aria-label="Instagram"><svg viewBox="0 0 24 24"><path d="M12 2.16c3.2 0 3.58.01 4.85.07 3.25.15 4.77 1.69 4.92 4.92.06 1.27.07 1.65.07 4.85s-.01 3.58-.07 4.85c-.15 3.23-1.66 4.77-4.92 4.92-1.27.06-1.64.07-4.85.07s-3.58-.01-4.85-.07c-3.26-.15-4.77-1.7-4.92-4.92C2.17 15.58 2.16 15.2 2.16 12s.01-3.58.07-4.85C2.38 3.92 3.9 2.38 7.15 2.23 8.42 2.17 8.8 2.16 12 2.16ZM12 0C8.74 0 8.33.01 7.05.07 2.7.27.27 2.69.07 7.05.01 8.33 0 8.74 0 12s.01 3.67.07 4.95c.2 4.36 2.62 6.78 6.98 6.98C8.33 23.99 8.74 24 12 24s3.67-.01 4.95-.07c4.35-.2 6.78-2.62 6.98-6.98.06-1.28.07-1.69.07-4.95s-.01-3.67-.07-4.95c-.2-4.35-2.62-6.78-6.98-6.98C15.67.01 15.26 0 12 0Zm0 5.84a6.16 6.16 0 1 0 0 12.32 6.16 6.16 0 0 0 0-12.32ZM12 16a4 4 0 1 1 0-8 4 4 0 0 1 0 8Zm6.4-11.85a1.44 1.44 0 1 0 0 2.88 1.44 1.44 0 0 0 0-2.88Z"/></svg></a>{% endif %}
+      </div>
+      <div class="sf-copy">© 2026 {{ profile.name }}. All rights reserved.</div>
+      <a class="sf-up" href="#" id="sf-up" aria-label="Back to top">↑</a>
+    </div>
+  </div></div>
+</div>
+
+<script>
+(function(){
+  var fl=document.getElementById('fq-list');
+  if(fl){
+    var items=fl.querySelectorAll('.fq-item');
+    items.forEach(function(it){
+      it.querySelector('.fq-q').addEventListener('click',function(){
+        var willOpen=!it.classList.contains('open');
+        items.forEach(function(o){o.classList.remove('open');o.querySelector('.fq-q').setAttribute('aria-expanded','false');});
+        if(willOpen){it.classList.add('open');this.setAttribute('aria-expanded','true');}
+      });
+    });
+  }
+  var ask=document.getElementById('fq-ask');
+  if(ask)ask.addEventListener('click',function(){
+    var f=document.getElementById('sf-form');if(!f)return;
+    f.scrollIntoView({behavior:'smooth',block:'center'});
+    setTimeout(function(){f.name.focus({preventScroll:true});},500);
+  });
+  var up=document.getElementById('sf-up');
+  if(up)up.addEventListener('click',function(e){e.preventDefault();window.scrollTo({top:0,behavior:'smooth'});});
+  var f=document.getElementById('sf-form'),m=document.getElementById('sf-msg');
+  if(!f)return;
+  f.addEventListener('submit',function(e){
+    e.preventDefault();
+    var b=f.querySelector('button'),d={name:f.name.value.trim(),email:f.email.value.trim(),message:f.message.value.trim()};
+    if(!d.name||!d.email||!d.message){m.style.color='#ff9db5';m.textContent='Please fill all fields.';return;}
+    b.disabled=true;m.style.color='#aab1e0';m.textContent='Sending...';
+    fetch(f.dataset.url,{method:'POST',headers:{'Content-Type':'application/json','X-CSRFToken':f.dataset.csrf},body:JSON.stringify(d)})
+      .then(function(r){return r.json().then(function(j){return{ok:r.ok&&j.ok,j:j};});})
+      .then(function(x){
+        if(x.ok){m.style.color='#3DDC97';m.textContent='Sent! Thank you.';f.reset();}
+        else{m.style.color='#ff9db5';m.textContent=(x.j&&x.j.error)||'Please check your details.';}
+      })
+      .catch(function(){m.style.color='#ff9db5';m.textContent='Network error. Try again.';})
+      .then(function(){b.disabled=false;});
+  });
+})();
+</script>

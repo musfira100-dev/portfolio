@@ -141,6 +141,7 @@ def _page(request, template, current, **extra):
     nxt = PAGES[(idx + 1) % len(PAGES)]
     ctx = {
         "profile": SiteProfile.load(),
+        "home": reverse("portfolio:index"),
         "nav": [{"url": reverse(f"portfolio:{n}"), "num": num, "label": label, "active": n == current}
                 for n, num, label in PAGES],
         "page_num": PAGES[idx][1],
